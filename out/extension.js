@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = require("vscode");
+const completionProvider_1 = require("./completionProvider");
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 function activate(context) {
@@ -17,19 +18,8 @@ function activate(context) {
         // Display a message box to the user
         vscode.window.showInformationMessage('deep-assoc-completion-vscode loaded!');
     });
-    // simple completion that suggests 'log/error' if user types 'console.'
-    const completionProvider = vscode.languages.registerCompletionItemProvider('plaintext', {
-        provideCompletionItems(document, position) {
-            const linePrefix = document.lineAt(position).text.substr(0, position.character);
-            if (!linePrefix.endsWith('console.'))
-                return undefined;
-            return [
-                new vscode.CompletionItem('log', vscode.CompletionItemKind.Method),
-                new vscode.CompletionItem('error', vscode.CompletionItemKind.Method),
-            ];
-        },
-    }, '.');
-    context.subscriptions.push(disposable, completionProvider);
+    const completion = completionProvider_1.completionProvider();
+    context.subscriptions.push(disposable, completion);
 }
 exports.activate = activate;
 // this method is called when your extension is deactivated

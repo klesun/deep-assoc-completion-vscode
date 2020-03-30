@@ -11,6 +11,7 @@ Supposedly will achieve this: https://github.com/bmewburn/vscode-intelephense/is
 List of features: (yet to be updated)
 - Specify associative array keys in phpdoc for completion and type inference. Either with [PSALM](https://github.com/vimeo/psalm/blob/master/docs/annotating_code/type_syntax/array_types.md#object-like-arrays) format or [deep-assoc](https://github.com/klesun/deep-assoc-completion/issues/63) format, or both.
 - Infer array key types
+- Infer function call result types
 - Provide completion and GoTo functionality for array keys
 - Infer types of arguments inside anonymous functions like in `array_map()`
 - Function usage based argument type inference

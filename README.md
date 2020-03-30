@@ -6,7 +6,7 @@ An order we received on https://klesun-productions.com
 
 Will most likely be based on [vscode-intelephense](https://github.com/bmewburn/vscode-intelephense) as either an additional module or a pull request.
 
-Supposedly will achive this: https://github.com/bmewburn/vscode-intelephense/issues/249
+Supposedly will achieve this: https://github.com/bmewburn/vscode-intelephense/issues/249
 
 List of features: (yet to be updated)
 - Specify associative array keys in phpdoc for completion and type inference. Either with [PSALM](https://github.com/vimeo/psalm/blob/master/docs/annotating_code/type_syntax/array_types.md#object-like-arrays) format or [deep-assoc](https://github.com/klesun/deep-assoc-completion/issues/63) format, or both.

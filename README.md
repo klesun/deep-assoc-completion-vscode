@@ -2,7 +2,7 @@
 
 A yet to be implemented extension for vscode similar to it's [phpstorm counterpart](https://github.com/klesun/deep-assoc-completion)
 
-An order we received on klesun-productions.com
+An order we received on https://klesun-productions.com
 
 Will most likely be based on [vscode-intelephense](https://github.com/bmewburn/vscode-intelephense) as either an additional module or a pull request.
 

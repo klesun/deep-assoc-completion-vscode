@@ -16,3 +16,11 @@ List of features: (yet to be updated)
 - Infer types of arguments inside anonymous functions like in `array_map()`
 - Function usage based argument type inference
 - ...
+
+
+# Steps to run
+
+- `git clone` this project
+- run `npm ci` (if you forget to do that you'll get `The terminal process terminated with exit code: 1` error)
+- open this project in vscode
+- hit F5 to run sandbox instance of vscode with this extension plugged

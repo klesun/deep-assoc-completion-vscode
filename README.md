@@ -22,5 +22,10 @@ List of features: (yet to be updated)
 
 - `git clone` this project
 - run `npm ci` (if you forget to do that you'll get `The terminal process terminated with exit code: 1` error)
-- open this project in vscode
-- hit F5 to run sandbox instance of vscode with this extension plugged
+- go to `/lang_server` and do `npm ci` once more
+- open this project root in vscode
+- hit F5 to run sandbox instance of vscode with this extension plugged in
+
+# Misc
+
+Smoke Tests repository: https://github.com/klesun-misc/deep-assoc-completion-vscode-smoke-tests

@@ -10,9 +10,9 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.helloWorld"
+		"onLanguage:php"
 	],
-	"main": "./out/extension.js",
+	"main": "./src/main.js",
 	"contributes": {
 		"commands": [
 			{
@@ -41,5 +41,9 @@
 		"mocha": "^7.0.1",
 		"typescript": "^3.7.5",
 		"vscode-test": "^1.3.0"
+	},
+	"dependencies": {
+		"vscode-languageclient": "latest",
+		"ts-node": "latest"
 	}
 }

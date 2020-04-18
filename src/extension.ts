@@ -1,30 +1,63 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { workspace, ExtensionContext } from 'vscode';
 import { completionProvider } from './completionProvider';
+import * as path from 'path';
+import {
+	LanguageClient,
+	LanguageClientOptions,
+	ServerOptions,
+	TransportKind
+} from 'vscode-languageclient';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+let client: LanguageClient;
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "deep-assoc-completion-vscode" is now active!');
+const setupLangServer = (context: ExtensionContext) => {
+	const scriptPath = path.join('src', 'lang_server', 'src', 'main.js');
+	const runOptions = {
+		module: context.asAbsolutePath(scriptPath),
+		transport: TransportKind.ipc,
+	};
+	const serverOptions: ServerOptions = {
+		run: runOptions,
+		debug: {...runOptions,
+			options: {
+				// --inspect=6009: runs the server in Node's Inspector mode
+				// so VS Code can attach to the server for debugging
+				execArgv: ['--nolazy', '--inspect=6009']
+			},
+		},
+	};
+	let clientOptions: LanguageClientOptions = {
+		// Register the server for plain text documents
+		documentSelector: [{ scheme: 'file', language: 'php' }],
+		synchronize: {
+			// Notify the server about file changes to '.clientrc files contained in the workspace
+			fileEvents: workspace.createFileSystemWatcher('**/*.php'),
+		},
+	};
+	client = new LanguageClient(
+		'deep-assoc-completion-vscode',
+		'deep-assoc-completion-vscode',
+		serverOptions,
+		clientOptions
+	);
+	client.start();
+	client.onReady();
+};
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
+export function activate(context: ExtensionContext) {
 	let disposable = vscode.commands.registerCommand('extension.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-
-		// Display a message box to the user
 		vscode.window.showInformationMessage('deep-assoc-completion-vscode loaded!');
 	});
-
-	const completion = completionProvider(); 
-
+	const completion = completionProvider();
 	context.subscriptions.push(disposable, completion);
+
+	setupLangServer(context);
 }
 
 // this method is called when your extension is deactivated
-export function deactivate() {}
+export function deactivate() {
+	if (client) {
+		client.stop();
+	}
+}

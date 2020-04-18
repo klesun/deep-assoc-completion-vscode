@@ -1,2 +1,4 @@
 /node_modules/
 /out/
+/.idea/
+/src/lang_server/node_modules/

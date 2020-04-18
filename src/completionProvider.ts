@@ -8,8 +8,9 @@ export function completionProvider () {
 			provideCompletionItems(document: vscode.TextDocument, position: vscode.Position) {
 				const linePrefix = document.lineAt(position).text.substr(0, position.character);
 
-				if (!linePrefix.endsWith('console.'))
+				if (!linePrefix.endsWith('console.')) {
 					return undefined;
+				}
 
 				return [
 					new vscode.CompletionItem('log', vscode.CompletionItemKind.Method),

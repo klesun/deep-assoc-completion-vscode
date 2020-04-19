@@ -1,7 +1,6 @@
 
 import {
 	createConnection,
-	TextDocuments,
 	ProposedFeatures,
 	InitializeParams,
 	CompletionItem,
@@ -11,55 +10,95 @@ import {
 	InitializeResult
 } from 'vscode-languageserver';
 
-import {
-	TextDocument
-} from 'vscode-languageserver-textdocument';
+import { Intelephense } from 'intelephense';
+import Log from './Log';
 
-const connection = createConnection(ProposedFeatures.all);
+type Connection = ReturnType<typeof createConnection>;
 
-let documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
+const addIntelephenseListeners = async (connection: Connection) => {
+	await Intelephense.initialise({
+		storagePath: '/tmp',
+		logWriter: {
+			info: connection.console.info,
+			warn: connection.console.warn,
+			error: connection.console.error
+		},
+		clearCache: true,
+	});
 
-connection.onInitialize((params: InitializeParams) => {
-	const capabilities = params.capabilities;
-	const hasWorkspaceFolderCapability = !!(
-		capabilities.workspace && !!capabilities.workspace.workspaceFolders
-	);
-
-	const result: InitializeResult = {
-		capabilities: {
-			textDocumentSync: TextDocumentSyncKind.Incremental,
-			// Tell the client that the server supports code completion
-			completionProvider: {
-			}
+	connection.onDidOpenTextDocument((params) => {
+		const length = params.textDocument.text.length;
+		const maxLength = 300 * 1024;
+		if (length > maxLength) {
+			connection.console.warn(`${params.textDocument.uri} not opened -- ${length} over max file size of ${maxLength} chars.`);
+			return;
 		}
-	};
-	if (hasWorkspaceFolderCapability) {
-		result.capabilities.workspace = {
-			workspaceFolders: {
-				supported: true
+		Intelephense.openDocument(params.textDocument);
+	});
+
+	connection.onDidChangeTextDocument((params) => {
+		Intelephense.editDocument(params.textDocument, params.contentChanges);
+	});
+
+	connection.onDidCloseTextDocument((params) => {
+		Intelephense.closeDocument(params.textDocument);
+	});
+
+	connection.onShutdown(Intelephense.shutdown);
+
+	connection.onCompletion(
+		async (params: TextDocumentPositionParams): Promise<CompletionItem[]> => {
+			const intelOptions = await Promise.resolve()
+				.then(() => Intelephense.provideCompletions(params.textDocument, params.position))
+				.catch(exc => {
+					Log.info('ololo exc - ' + exc.stack);
+					return Promise.reject(exc);
+				});
+			await Log.info('pidor guzno', {a: 123, b: 345, intelOptions});
+			return [
+				{label: 'Ololo Optionn', kind: CompletionItemKind.Text, data: 1},
+				{label: 'Guzno Option', kind: CompletionItemKind.Text, data: 2}
+			];
+		}
+	);
+};
+
+const main = () => {
+	const connection = createConnection(ProposedFeatures.all);
+
+	connection.onInitialize(async (params: InitializeParams) => {
+		await addIntelephenseListeners(connection);
+
+		const capabilities = params.capabilities;
+		const hasWorkspaceFolderCapability = !!(
+			capabilities.workspace && !!capabilities.workspace.workspaceFolders
+		);
+
+		const result: InitializeResult = {
+			capabilities: {
+				textDocumentSync: TextDocumentSyncKind.Incremental,
+				// Tell the client that the server supports code completion
+				completionProvider: {
+				}
 			}
 		};
-	}
-	return result;
-});
+		if (hasWorkspaceFolderCapability) {
+			result.capabilities.workspace = {
+				workspaceFolders: {
+					supported: true
+				}
+			};
+		}
+		return result;
+	});
 
-connection.onInitialized(() => {
-});
+	connection.listen();
+};
 
-connection.onDidChangeWatchedFiles(_change => {
-	// Monitored files have change in VSCode
-	connection.console.log('We received an file change event');
-});
+main();
 
-connection.onCompletion(
-	(_textDocumentPosition: TextDocumentPositionParams): CompletionItem[] => {
-		return [
-			{label: 'Ololo Option', kind: CompletionItemKind.Text, data: 1},
-			{label: 'Guzno Option', kind: CompletionItemKind.Text, data: 2}
-		];
-	}
-);
-
-documents.listen(connection);
-
-connection.listen();
+process.addListener('message', Log.info);
+process.addListener('multipleResolves', Log.info);
+process.addListener(<any>'uncaughtException', Log.info);
+process.addListener(<any>'unhandledRejection', Log.info);
+process.addListener(<any>'warning', Log.info);

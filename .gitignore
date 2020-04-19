@@ -2,3 +2,4 @@
 /out/
 /.idea/
 /src/lang_server/node_modules/
+/src/lang_server/out/

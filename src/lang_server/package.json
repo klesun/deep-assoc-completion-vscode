@@ -12,10 +12,10 @@
 		"url": "https://github.com/Microsoft/vscode-extension-samples"
 	},
 	"dependencies": {
+		"klesun-node-tools": "git+https://github.com/klesun-misc/klesun-node-tools.git#6c10bd857928f8db36fdf4b9c50807f3d27281b1",
 		"vscode-languageserver": "latest",
 		"ts-node": "latest",
-		"intelephense": "^0.8.8",
-		"vscode-languageserver-textdocument": "^1.0.1"
+		"intelephense": "^0.8.8"
 	},
 	"scripts": {}
 }

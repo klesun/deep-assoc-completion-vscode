@@ -29,3 +29,6 @@ List of features: (yet to be updated)
 # Misc
 
 Smoke Tests repository: https://github.com/klesun-misc/deep-assoc-completion-vscode-smoke-tests
+
+
+Thanks to Louis and Mike for being homies

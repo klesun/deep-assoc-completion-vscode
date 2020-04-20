@@ -1,5 +1,7 @@
 /node_modules/
 /out/
 /.idea/
+/.vscode/settings.json
+
 /src/lang_server/node_modules/
 /src/lang_server/out/

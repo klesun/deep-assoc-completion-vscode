@@ -4,10 +4,11 @@ const fs = fsMod.promises;
 
 const Debug = require('klesun-node-tools/src/Debug.js');
 
+
 const Log = {
-    info: (msg: string, data?: any) => {
+    info: (msgData: any) => {
         const path = __dirname + '/../out/Debug_log.txt';
-        const formatted = Debug.jsExport({msg, ...(!data ? {} : data)});
+        const formatted = Debug.jsExport(msgData);
         return fs.appendFile(path, formatted + ',\n');
     },
 };

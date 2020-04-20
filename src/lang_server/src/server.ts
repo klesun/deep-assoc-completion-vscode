@@ -12,6 +12,7 @@ import {
 
 import { Intelephense } from 'intelephense';
 import Log from './Log';
+import AssocKeyPvdr from './entry/AssocKeyPvdr';
 
 type Connection = ReturnType<typeof createConnection>;
 
@@ -54,10 +55,19 @@ const addIntelephenseListeners = async (connection: Connection) => {
 					Log.info('ololo exc - ' + exc.stack);
 					return Promise.reject(exc);
 				});
-			await Log.info('pidor guzno', {a: 123, b: 345, intelOptions});
+			const options = await AssocKeyPvdr({
+				...Intelephense.getApiTools(),
+				uri: params.textDocument.uri,
+				position: params.position,
+			}).catch(exc => {
+				Log.info({message: exc.message, stack: exc.stack});
+				return Promise.reject(exc);
+			});
+			await Log.info({msg: 'pidor guzno', intelOptions, ololo: Intelephense.getApiTools().documentStore + ''});
 			return [
 				{label: 'Ololo Optionn', kind: CompletionItemKind.Text, data: 1},
-				{label: 'Guzno Option', kind: CompletionItemKind.Text, data: 2}
+				{label: 'Guzno Option', kind: CompletionItemKind.Text, data: 2},
+				...options,
 			];
 		}
 	);

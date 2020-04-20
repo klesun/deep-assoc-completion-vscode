@@ -6,6 +6,7 @@
 	"engines": {
 		"vscode": "^1.43.0"
 	},
+	"type": "module",
 	"categories": [
 		"Other"
 	],

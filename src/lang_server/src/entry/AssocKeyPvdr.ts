@@ -1,52 +1,29 @@
 import { SymbolStore } from "intelephense/lib/symbolStore";
-import { ParsedDocumentStore } from "intelephense/lib/parsedDocument";
+import { ParsedDocumentStore, ParsedDocument } from "intelephense/lib/parsedDocument";
 import { ReferenceStore, Reference } from "intelephense/lib/reference";
 import { CompletionItem } from "vscode-languageserver";
 import { ParseTreeTraverser } from "intelephense/lib/parseTreeTraverser";
 import * as lsp from 'vscode-languageserver-types';
 import { Token, Phrase, PhraseType, LexerMode } from 'php7parser';
 import Log from "../Log";
+import { Location } from 'vscode-languageserver-types';
 
 // ts-node, enums
 import { TokenType } from 'php7parser';
+import Psi, { Opt, IPsi } from "../helpers/Psi";
+import { MemberMergeStrategy } from "intelephense/lib/typeAggregate";
 
-const asToken = (traverser: ParseTreeTraverser): Token | null => {
-    return traverser.node && 'tokenType' in traverser.node ? traverser.node : null;
+const describeNode = (node: Phrase | Token | null, doc: ParsedDocument): string => {
+    if (!node) {
+        return '(no node)';
+    } else if ('phraseType' in node) {
+        const subDescrs = node.children.map(subNode => describeNode(subNode, doc));
+        return `${PhraseType[node.phraseType]}(${subDescrs.join(', ')})`;
+    } else {
+        const text = doc.text.slice(node.offset, node.offset + Math.min(node.length, 20));
+        return `${TokenType[node.tokenType]}(${text}) at ${node.offset}, ${node.length}`;
+    }
 };
-
-const asPhrase = (traverser: ParseTreeTraverser): Phrase | null => {
-    return traverser.node && 'phraseType' in traverser.node ? traverser.node : null;
-};
-
-/** immutable unlike the traverser */
-const Psi = (traverser: ParseTreeTraverser) => {
-    return {
-        node: traverser.node,
-        asToken: () => asToken(traverser),
-        asPhrase: () => asPhrase(traverser),
-        parent: () => {
-            const newTraverser = traverser.clone();
-            newTraverser.parent();
-            if (newTraverser.node) {
-                return Psi(newTraverser);
-            } else {
-                return null;
-            }
-        },
-        nthChild: (n: number) => {
-            const newTraverser = traverser.clone();
-            newTraverser.nthChild(n);
-            if (newTraverser.node) {
-                return Psi(newTraverser);
-            } else {
-                return null;
-            }
-        },
-        reference: traverser.reference || null,
-    };
-};
-
-type Psi = ReturnType<typeof Psi>;
 
 const AssocKeyPvdr = async ({
     symbolStore, documentStore, refStore, uri, position,
@@ -58,64 +35,56 @@ const AssocKeyPvdr = async ({
     uri: string,
     position: lsp.Position,
 }): Promise<CompletionItem[]> => {
-    const doc = documentStore.find(uri);
     const table = symbolStore.getSymbolTable(uri);
     const refTable = refStore.getReferenceTable(uri);
 
-    if (!doc || !table || !refTable) {
+    if (!table || !refTable) {
         return [];
     }
 
-    const describeNode = (node?: Phrase | Token): string => {
-        if (!node) {
-            return '(no node)';
-        } else if ('phraseType' in node) {
-            const subDescrs = node.children.map(describeNode);
-            return `${PhraseType[node.phraseType]}(${subDescrs.join(', ')})`;
-        } else {
-            const text = doc.text.slice(node.offset, node.offset + Math.min(node.length, 20));
-            return `${TokenType[node.tokenType]}(${text}) at ${node.offset}, ${node.length}`;
-        }
-    };
-
-    const getCompletions = async (traverser: ParseTreeTraverser, word: string): Promise<CompletionItem[]> => {
-        Log.info({msg: "ololo get completions", word, node: describeNode(traverser.node)});
-        const lit = Psi(traverser);
-        if (lit?.asToken()?.tokenType !== TokenType.StringLiteral) {
+    const getPsiAt = ({uri, position}: {uri: string, position: lsp.Position}): Opt<IPsi> => {
+        const doc = documentStore.find(uri);
+        if (!doc) {
             return [];
         }
-        const assoc = lit.parent();
-        if (assoc?.asPhrase()?.phraseType !== PhraseType.SubscriptExpression) {
-            return [];
-        }
-        const arrExpr = assoc.nthChild(0);
-        // TODO: handle other sources of key, like method
-        // call, instead of asserting presence of reference
-        if (!arrExpr || !arrExpr.reference) {
-            return [];
-        }
-        //Log.info({msg: 'ololo parent - ' + describeNode(arrExpr?.node)});
-        Log.info({"ololo ref": arrExpr.reference});
-        // TODO: implement further!
-        const completionText = arrExpr.reference.type || '(pls specify var type in phpdoc)';
-
-        return [{label: completionText}];
-    };
-
-    const main = () => {
         const traverser = new ParseTreeTraverser(doc, table, refTable);
         traverser.position(position);
-
-        //return early if not in <?php ?>
-        const t = traverser.node as Token;
-        if (!t || t.tokenType === TokenType.Text) {
+        if (!traverser.node) {
             return [];
+        } else {
+            Log.info({'lololo getPsiAt': describeNode(traverser.node, doc)});
+            return [Psi({traverser, node: traverser.node})];
         }
+    };
 
-        const offset = doc.offsetAtPosition(position);
-        const word = doc.wordAtOffset(offset);
+    const getCompletions = (psi: IPsi): CompletionItem[] => {
+        return psi.asToken(TokenType.StringLiteral)
+            .flatMap(lit => lit.parent())
+            .flatMap(psi => psi.asPhrase(PhraseType.SubscriptExpression))
+            .flatMap(assoc => assoc.nthChild(0))
+            // TODO: handle other sources of key, like method
+            // call, instead of asserting presence of reference
+            .flatMap(arrExpr => arrExpr.reference)
+            .flatMap(ref => symbolStore.findSymbolsByReference(ref, MemberMergeStrategy.None))
+            .flatMap(sym => sym.location ? [sym.location] : [])
+            // .flatMap(loc => {
+            //     return getPsiAt({
+            //         uri: loc.uri,
+            //         position: loc.range.end,
+            //     });
+            // })
+            .flatMap(sym => {
+                Log.info({"ololo sym decl": sym});
+                return [];
+            });
+        // const completionText = arrExpr.reference.type || '(pls specify var type in phpdoc)';
+        // const arrDecl = arrExpr.reference.location;
+        // return [{label: completionText}];
+    };
 
-        return getCompletions(traverser, word);
+    const main = async () => {
+        return getPsiAt({uri, position})
+            .flatMap(getCompletions);
     };
 
 

@@ -14,7 +14,7 @@
 	},
 	"dependencies": {
 		"klesun-node-tools": "git+https://github.com/klesun-misc/klesun-node-tools.git#6c10bd857928f8db36fdf4b9c50807f3d27281b1",
-		"intelephense": "git+https://github.com/klesun-misc/intelephense-0.8.8-fork.git#ddf1ac65ef198a030036930003293bb9defec5e9",
+		"intelephense": "git+https://github.com/klesun-misc/intelephense-0.8.8-fork.git#74160f0dce05f54722655b6010a9ecacfe7d83ba",
 		"php7parser": "git+https://github.com/klesun-misc/php7parser-1.0.8-fork.git#01138984a1bf4f456d70b6160fb482fa894a522e",
 		"vscode-languageserver-types": "^3.5.0",
 		"vscode-languageserver": "latest",

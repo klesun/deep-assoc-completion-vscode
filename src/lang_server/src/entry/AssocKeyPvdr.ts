@@ -13,18 +13,6 @@ import { TokenType } from 'php7parser';
 import Psi, { Opt, IPsi } from "../helpers/Psi";
 import { MemberMergeStrategy } from "intelephense/lib/typeAggregate";
 
-const describeNode = (node: Phrase | Token | null, doc: ParsedDocument): string => {
-    if (!node) {
-        return '(no node)';
-    } else if ('phraseType' in node) {
-        const subDescrs = node.children.map(subNode => describeNode(subNode, doc));
-        return `${PhraseType[node.phraseType]}(${subDescrs.join(', ')})`;
-    } else {
-        const text = doc.text.slice(node.offset, node.offset + Math.min(node.length, 20));
-        return `${TokenType[node.tokenType]}(${text}) at ${node.offset}, ${node.length}`;
-    }
-};
-
 const AssocKeyPvdr = async ({
     symbolStore, documentStore, refStore, uri, position,
 }: {
@@ -52,8 +40,9 @@ const AssocKeyPvdr = async ({
         if (!traverser.node) {
             return [];
         } else {
-            Log.info({'lololo getPsiAt': describeNode(traverser.node, doc)});
-            return [Psi({traverser, node: traverser.node})];
+            const psi = Psi({traverser, node: traverser.node, doc});
+            Log.info({'lololo getPsiAt': psi + ''});
+            return [psi];
         }
     };
 
@@ -65,21 +54,26 @@ const AssocKeyPvdr = async ({
             // TODO: handle other sources of key, like method
             // call, instead of asserting presence of reference
             .flatMap(arrExpr => arrExpr.reference)
-            .flatMap(ref => symbolStore.findSymbolsByReference(ref, MemberMergeStrategy.None))
-            .flatMap(sym => sym.location ? [sym.location] : [])
-            // .flatMap(loc => {
-            //     return getPsiAt({
-            //         uri: loc.uri,
-            //         position: loc.range.end,
-            //     });
-            // })
-            .flatMap(sym => {
-                Log.info({"ololo sym decl": sym});
+            .flatMap(ref => symbolStore
+                .findSymbolsByReference(ref, MemberMergeStrategy.None)
+                .flatMap(sym => sym.location ? [sym.location] : [])
+                .flatMap(sym => getPsiAt({
+                    uri: ref.location.uri,
+                    position: sym.range.end,
+                }))
+            )
+            .flatMap(psi => psi.asToken(TokenType.VariableName))
+            .flatMap(leaf => leaf.parent())
+            .filter(par => par.node.phraseType === PhraseType.SimpleVariable)
+            .flatMap(leaf => leaf.parent()
+                .filter(par => par.node.phraseType === PhraseType.SimpleAssignmentExpression)
+                .filter(ass => ass.nthChild(0).some(leaf.eq))
+            )
+            .flatMap(ass => ass.children().slice(1).flatMap(psi => psi.asPhrase()))
+            .flatMap(arrCtor => {
+                Log.info({"ololo arrCtor": arrCtor + ''});
                 return [];
             });
-        // const completionText = arrExpr.reference.type || '(pls specify var type in phpdoc)';
-        // const arrDecl = arrExpr.reference.location;
-        // return [{label: completionText}];
     };
 
     const main = async () => {

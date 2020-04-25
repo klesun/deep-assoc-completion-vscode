@@ -104,15 +104,15 @@ const AssocKeyPvdr = async ({
     const assertFuncRef = (exprPsi: IPsi): Reference[] => {
         return [
             ...exprPsi.asPhrase(PhraseType.FunctionCallExpression)
-                .flatMap(_ => _.reference),
+                .flatMap(psi => psi.reference),
             ...exprPsi.asPhrase(PhraseType.MethodCallExpression)
-                .flatMap(_ => _.children())
-                .flatMap(_ => _.asPhrase(PhraseType.MemberName))
-                .flatMap(_ => _.reference),
+                .flatMap(psi => psi.children())
+                .flatMap(psi => psi.asPhrase(PhraseType.MemberName))
+                .flatMap(psi => psi.reference),
             ...exprPsi.asPhrase(PhraseType.ScopedCallExpression)
-                .flatMap(_ => _.children())
-                .flatMap(_ => _.asPhrase(PhraseType.ScopedMemberName))
-                .flatMap(_ => _.reference),
+                .flatMap(psi => psi.children())
+                .flatMap(psi => psi.asPhrase(PhraseType.ScopedMemberName))
+                .flatMap(psi => psi.reference),
         ];
     };
 
@@ -134,10 +134,28 @@ const AssocKeyPvdr = async ({
             .flatMap(retPsi => retPsi.children().slice(1).flatMap(psi => psi.asPhrase()))
             .flatMap(resolveExpr);
 
+    const resolveVarRef = (exprPsi: IPsi): Type[] =>
+        exprPsi.asPhrase(PhraseType.SimpleVariable)
+            .flatMap(_ => _.asPhrase(PhraseType.SimpleVariable))
+            .flatMap(arrExpr => arrExpr.reference)
+            .flatMap(ref => symbolStore.findSymbolsByReference(ref, MemberMergeStrategy.None))
+            .flatMap(sym => opt(symbolStore.symbolLocation(sym)))
+            .flatMap(loc => getPsiAt({uri: loc.uri, position: loc.range.end}))
+            .flatMap(psi => psi.asToken(TokenType.VariableName))
+            .flatMap(leaf => leaf.parent())
+            .filter(par => par.node.phraseType === PhraseType.SimpleVariable)
+            .flatMap(leaf => leaf.parent()
+                .filter(par => par.node.phraseType === PhraseType.SimpleAssignmentExpression)
+                .filter(ass => ass.nthChild(0).some(leaf.eq))
+            )
+            .flatMap(ass => ass.children().slice(1).flatMap(psi => psi.asPhrase()))
+            .flatMap(resolveExpr);
+
     const resolveExpr = (exprPsi: IPsi): Type[] => {
         const result = [
             ...resolveAsArrCtor(exprPsi),
             ...resolveAsFuncCall(exprPsi),
+            ...resolveVarRef(exprPsi),
         ];
         if (!result.length) {
             //Log.info({'ololo no results for': exprPsi + ''});
@@ -152,18 +170,6 @@ const AssocKeyPvdr = async ({
             .flatMap(assoc => assoc.nthChild(0))
             // TODO: handle other sources of key, like method
             // call, instead of asserting presence of reference
-            .flatMap(arrExpr => arrExpr.reference)
-            .flatMap(ref => symbolStore.findSymbolsByReference(ref, MemberMergeStrategy.None))
-            .flatMap(sym => opt(symbolStore.symbolLocation(sym)))
-            .flatMap(loc => getPsiAt({uri: loc.uri, position: loc.range.end}))
-            .flatMap(psi => psi.asToken(TokenType.VariableName))
-            .flatMap(leaf => leaf.parent())
-            .filter(par => par.node.phraseType === PhraseType.SimpleVariable)
-            .flatMap(leaf => leaf.parent()
-                .filter(par => par.node.phraseType === PhraseType.SimpleAssignmentExpression)
-                .filter(ass => ass.nthChild(0).some(leaf.eq))
-            )
-            .flatMap(ass => ass.children().slice(1).flatMap(psi => psi.asPhrase()))
             .flatMap(resolveExpr)
             .flatMap(t => t.kind === 'IRecordArr' ? t.entries : [])
             .map(e => e.keyType)

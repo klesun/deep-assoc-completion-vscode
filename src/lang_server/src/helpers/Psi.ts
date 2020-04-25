@@ -28,6 +28,7 @@ const getText = (node: Node, doc: ParsedDocument) => {
     const tokens = flattenTokens(node);
     const offset = tokens[0].offset;
     const length = tokens.reduce((sum, t) => sum + t.length, 0);
+
     return doc.text.slice(offset, offset + length);
 };
 

@@ -13,6 +13,21 @@ import Psi, { Opt, IPsi } from "../helpers/Psi";
 import { MemberMergeStrategy } from "intelephense/lib/typeAggregate";
 import { Type } from "../structures/Type";
 
+const opt = <T>(nullable?: T): Opt<T> => nullable ? [nullable] : [];
+
+const findFunctionReturns = (stPsi: Psi<Phrase>): Psi<Phrase>[] => {
+    if (stPsi.node.phraseType === PhraseType.FunctionDeclarationBody) {
+        // skip anonymous functions, they have their own scope
+        return [];
+    } else if (stPsi.node.phraseType === PhraseType.ReturnStatement) {
+        return [stPsi];
+    } else {
+        return stPsi.children()
+            .flatMap(c => c.asPhrase())
+            .flatMap(findFunctionReturns);
+    }
+};
+
 /**
  * @param {String} litText - escaped, like "somekey\t\\Ol\"olo"
  * @return {Opt<string>} - unescaped: somekey    \Ol"olo
@@ -65,29 +80,48 @@ const AssocKeyPvdr = async ({
         }
     };
 
-    const findExprType = (exprPsi: IPsi): Type[] => {
-        const typeChunks: Type[][] = [
-            exprPsi.asPhrase(PhraseType.ArrayCreationExpression)
-                .flatMap(arrCtor => arrCtor.children())
-                .flatMap(subPsi => subPsi.asPhrase(PhraseType.ArrayInitialiserList))
-                .map(listPsi => {
-                    const keyNames = listPsi.children()
-                        .flatMap(subPsi => subPsi.asPhrase(PhraseType.ArrayElement))
-                        .flatMap(elPsi => elPsi.children())
-                        .flatMap(subPsi => subPsi.asPhrase(PhraseType.ArrayKey))
-                        .flatMap(keyPsi => keyPsi.children())
-                        .flatMap(subPsi => subPsi.asToken(TokenType.StringLiteral))
-                        .flatMap(strLit => unquote(strLit.text()));
-                    return {
-                        kind: 'IRecordArr',
-                        entries: keyNames.map(content => ({
-                            keyType: {kind: 'IStr', content},
-                            valueType: {kind: 'IAny'},
-                        })),
-                    };
-                }),
+    const resolveAsArrCtor = (exprPsi: IPsi): Type[] =>
+        exprPsi.asPhrase(PhraseType.ArrayCreationExpression)
+            .flatMap(arrCtor => arrCtor.children())
+            .flatMap(subPsi => subPsi.asPhrase(PhraseType.ArrayInitialiserList))
+            .map(listPsi => {
+                const keyNames = listPsi.children()
+                    .flatMap(subPsi => subPsi.asPhrase(PhraseType.ArrayElement))
+                    .flatMap(elPsi => elPsi.children())
+                    .flatMap(subPsi => subPsi.asPhrase(PhraseType.ArrayKey))
+                    .flatMap(keyPsi => keyPsi.children())
+                    .flatMap(subPsi => subPsi.asToken(TokenType.StringLiteral))
+                    .flatMap(strLit => unquote(strLit.text()));
+                return {
+                    kind: 'IRecordArr',
+                    entries: keyNames.map(content => ({
+                        keyType: {kind: 'IStr', content},
+                        valueType: {kind: 'IAny'},
+                    })),
+                };
+            });
+
+    const resolveAsFuncCall = (exprPsi: IPsi): Type[] =>
+        exprPsi.asPhrase(PhraseType.FunctionCallExpression)
+            .flatMap(callPsi => callPsi.reference)
+            .flatMap(ref => symbolStore.findSymbolsByReference(ref, MemberMergeStrategy.None))
+            .flatMap(sym => opt(symbolStore.symbolLocation(sym)))
+            .flatMap(loc => getPsiAt({uri: loc.uri, position: loc.range.end}))
+            .flatMap(decl => decl.asToken(TokenType.CloseBrace))
+            .flatMap(bracePsi => bracePsi.parent())
+            .flatMap(par => par.asPhrase(PhraseType.FunctionDeclarationBody))
+            .flatMap(funcBody => funcBody.children())
+            .flatMap(psi => psi.asPhrase(PhraseType.StatementList))
+            .flatMap(stList => stList.children().flatMap(psi => psi.asPhrase()))
+            .flatMap(findFunctionReturns)
+            .flatMap(retPsi => retPsi.children().slice(1).flatMap(psi => psi.asPhrase()))
+            .flatMap(resolveExpr);
+
+    const resolveExpr = (exprPsi: IPsi): Type[] => {
+        return [
+            ...resolveAsArrCtor(exprPsi),
+            ...resolveAsFuncCall(exprPsi),
         ];
-        return typeChunks.flatMap(a => a);
     };
 
     const getCompletions = (psi: IPsi): CompletionItem[] => {
@@ -98,14 +132,9 @@ const AssocKeyPvdr = async ({
             // TODO: handle other sources of key, like method
             // call, instead of asserting presence of reference
             .flatMap(arrExpr => arrExpr.reference)
-            .flatMap(ref => symbolStore
-                .findSymbolsByReference(ref, MemberMergeStrategy.None)
-                .flatMap(sym => sym.location ? [sym.location] : [])
-                .flatMap(sym => getPsiAt({
-                    uri: ref.location.uri,
-                    position: sym.range.end,
-                }))
-            )
+            .flatMap(ref => symbolStore.findSymbolsByReference(ref, MemberMergeStrategy.None))
+            .flatMap(sym => opt(symbolStore.symbolLocation(sym)))
+            .flatMap(loc => getPsiAt({uri: loc.uri, position: loc.range.end}))
             .flatMap(psi => psi.asToken(TokenType.VariableName))
             .flatMap(leaf => leaf.parent())
             .filter(par => par.node.phraseType === PhraseType.SimpleVariable)
@@ -114,7 +143,7 @@ const AssocKeyPvdr = async ({
                 .filter(ass => ass.nthChild(0).some(leaf.eq))
             )
             .flatMap(ass => ass.children().slice(1).flatMap(psi => psi.asPhrase()))
-            .flatMap(findExprType)
+            .flatMap(resolveExpr)
             .flatMap(t => t.kind === 'IRecordArr' ? t.entries : [])
             .map(e => e.keyType)
             .flatMap(kt => kt.kind === 'IStr' ? [kt.content] : [])

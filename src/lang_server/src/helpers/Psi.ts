@@ -61,13 +61,13 @@ const Psi = <T extends Node>({traverser, node, doc}: {
     node: T,
     doc: ParsedDocument,
 }): Psi<T> => {
-    const asPhrase = (phraseType?: PhraseType): Opt<Psi<Phrase>> => {
+    const asPhrase = (...phraseTypes: PhraseType[]): Opt<Psi<Phrase>> => {
         const phraseOpt = asPhraseNode(node);
         if (!phraseOpt.length) {
             return [];
         }
         const phrase = phraseOpt[0];
-        if (phraseType && phraseType !== phrase.phraseType) {
+        if (phraseTypes.length && !phraseTypes.includes(phrase.phraseType)) {
             return [];
         } else {
             return [Psi({traverser, node: phraseOpt[0], doc})];
@@ -132,7 +132,7 @@ const Psi = <T extends Node>({traverser, node, doc}: {
 interface Psi<T extends Node> {
     node: T,
     asToken: (tokenType?: TokenType) => Opt<Psi<Token>>,
-    asPhrase: (phraseType?: PhraseType) => Opt<Psi<Phrase>>,
+    asPhrase: (...phraseTypes: PhraseType[]) => Opt<Psi<Phrase>>,
     parent: () => Opt<Psi<Phrase>>,
     nthChild: (n: number) => Opt<Psi<Node>>,
     children: () => Psi<Node>[],

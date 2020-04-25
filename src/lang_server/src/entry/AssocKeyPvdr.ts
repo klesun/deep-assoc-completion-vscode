@@ -101,15 +101,32 @@ const AssocKeyPvdr = async ({
                 };
             });
 
+    const assertFuncRef = (exprPsi: IPsi): Reference[] => {
+        return [
+            ...exprPsi.asPhrase(PhraseType.FunctionCallExpression)
+                .flatMap(_ => _.reference),
+            ...exprPsi.asPhrase(PhraseType.MethodCallExpression)
+                .flatMap(_ => _.children())
+                .flatMap(_ => _.asPhrase(PhraseType.MemberName))
+                .flatMap(_ => _.reference),
+            ...exprPsi.asPhrase(PhraseType.ScopedCallExpression)
+                .flatMap(_ => _.children())
+                .flatMap(_ => _.asPhrase(PhraseType.ScopedMemberName))
+                .flatMap(_ => _.reference),
+        ];
+    };
+
     const resolveAsFuncCall = (exprPsi: IPsi): Type[] =>
-        exprPsi.asPhrase(PhraseType.FunctionCallExpression)
-            .flatMap(callPsi => callPsi.reference)
+        assertFuncRef(exprPsi)
             .flatMap(ref => symbolStore.findSymbolsByReference(ref, MemberMergeStrategy.None))
             .flatMap(sym => opt(symbolStore.symbolLocation(sym)))
             .flatMap(loc => getPsiAt({uri: loc.uri, position: loc.range.end}))
             .flatMap(decl => decl.asToken(TokenType.CloseBrace))
             .flatMap(bracePsi => bracePsi.parent())
-            .flatMap(par => par.asPhrase(PhraseType.FunctionDeclarationBody))
+            .flatMap(par => par.asPhrase(
+                PhraseType.FunctionDeclarationBody,
+                PhraseType.CompoundStatement,
+            ))
             .flatMap(funcBody => funcBody.children())
             .flatMap(psi => psi.asPhrase(PhraseType.StatementList))
             .flatMap(stList => stList.children().flatMap(psi => psi.asPhrase()))
@@ -118,10 +135,14 @@ const AssocKeyPvdr = async ({
             .flatMap(resolveExpr);
 
     const resolveExpr = (exprPsi: IPsi): Type[] => {
-        return [
+        const result = [
             ...resolveAsArrCtor(exprPsi),
             ...resolveAsFuncCall(exprPsi),
         ];
+        if (!result.length) {
+            //Log.info({'ololo no results for': exprPsi + ''});
+        }
+        return result;
     };
 
     const getCompletions = (psi: IPsi): CompletionItem[] => {

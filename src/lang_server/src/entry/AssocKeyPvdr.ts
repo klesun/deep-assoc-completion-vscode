@@ -6,12 +6,12 @@ import { ParseTreeTraverser } from "intelephense/lib/parseTreeTraverser";
 import * as lsp from 'vscode-languageserver-types';
 import { Token, Phrase, PhraseType, LexerMode } from 'php7parser';
 import Log from "../Log";
-import { Location } from 'vscode-languageserver-types';
 
 // ts-node, enums
 import { TokenType } from 'php7parser';
 import Psi, { Opt, IPsi } from "../helpers/Psi";
 import { MemberMergeStrategy } from "intelephense/lib/typeAggregate";
+import { Type } from "../structures/Type";
 
 /**
  * @param {String} litText - escaped, like "somekey\t\\Ol\"olo"
@@ -65,6 +65,31 @@ const AssocKeyPvdr = async ({
         }
     };
 
+    const findExprType = (exprPsi: IPsi): Type[] => {
+        const typeChunks: Type[][] = [
+            exprPsi.asPhrase(PhraseType.ArrayCreationExpression)
+                .flatMap(arrCtor => arrCtor.children())
+                .flatMap(subPsi => subPsi.asPhrase(PhraseType.ArrayInitialiserList))
+                .map(listPsi => {
+                    const keyNames = listPsi.children()
+                        .flatMap(subPsi => subPsi.asPhrase(PhraseType.ArrayElement))
+                        .flatMap(elPsi => elPsi.children())
+                        .flatMap(subPsi => subPsi.asPhrase(PhraseType.ArrayKey))
+                        .flatMap(keyPsi => keyPsi.children())
+                        .flatMap(subPsi => subPsi.asToken(TokenType.StringLiteral))
+                        .flatMap(strLit => unquote(strLit.text()));
+                    return {
+                        kind: 'IRecordArr',
+                        entries: keyNames.map(content => ({
+                            keyType: {kind: 'IStr', content},
+                            valueType: {kind: 'IAny'},
+                        })),
+                    };
+                }),
+        ];
+        return typeChunks.flatMap(a => a);
+    };
+
     const getCompletions = (psi: IPsi): CompletionItem[] => {
         return psi.asToken(TokenType.StringLiteral)
             .flatMap(lit => lit.parent())
@@ -89,15 +114,10 @@ const AssocKeyPvdr = async ({
                 .filter(ass => ass.nthChild(0).some(leaf.eq))
             )
             .flatMap(ass => ass.children().slice(1).flatMap(psi => psi.asPhrase()))
-            .flatMap(arrCtor => arrCtor.children())
-            .flatMap(subPsi => subPsi.asPhrase(PhraseType.ArrayInitialiserList))
-            .flatMap(listPsi => listPsi.children())
-            .flatMap(subPsi => subPsi.asPhrase(PhraseType.ArrayElement))
-            .flatMap(elPsi => elPsi.children())
-            .flatMap(subPsi => subPsi.asPhrase(PhraseType.ArrayKey))
-            .flatMap(keyPsi => keyPsi.children())
-            .flatMap(subPsi => subPsi.asToken(TokenType.StringLiteral))
-            .flatMap(strLit => unquote(strLit.text()))
+            .flatMap(findExprType)
+            .flatMap(t => t.kind === 'IRecordArr' ? t.entries : [])
+            .map(e => e.keyType)
+            .flatMap(kt => kt.kind === 'IStr' ? [kt.content] : [])
             .map((label, i) => ({
                 label, sortText: (i + '').padStart(7, '0'),
                 detail: 'deep-assoc FTW',

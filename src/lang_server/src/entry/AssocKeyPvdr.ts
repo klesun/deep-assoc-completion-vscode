@@ -13,6 +13,26 @@ import { TokenType } from 'php7parser';
 import Psi, { Opt, IPsi } from "../helpers/Psi";
 import { MemberMergeStrategy } from "intelephense/lib/typeAggregate";
 
+/**
+ * @param {String} litText - escaped, like "somekey\t\\Ol\"olo"
+ * @return {Opt<string>} - unescaped: somekey    \Ol"olo
+ */
+const unquote = (litText: string): Opt<string> => {
+    if (litText.length < 2) {
+        return []; // invalid format
+    }
+    const opening = litText[0];
+    const ending = litText.slice(-1)[0];
+    if (opening !== ending || !['\'', '"'].includes(opening)) {
+        // lol, just googled what backticks do...
+        return []; // invalid format
+    }
+    // TODO: implement
+    //  you do not usually use special characters in key name, so skipping for now,
+    //  since you anyway would want an escaped line break when completing a key name
+    return [litText.slice(1, -1)];
+};
+
 const AssocKeyPvdr = async ({
     symbolStore, documentStore, refStore, uri, position,
 }: {
@@ -41,7 +61,6 @@ const AssocKeyPvdr = async ({
             return [];
         } else {
             const psi = Psi({traverser, node: traverser.node, doc});
-            Log.info({'lololo getPsiAt': psi + ''});
             return [psi];
         }
     };
@@ -70,10 +89,19 @@ const AssocKeyPvdr = async ({
                 .filter(ass => ass.nthChild(0).some(leaf.eq))
             )
             .flatMap(ass => ass.children().slice(1).flatMap(psi => psi.asPhrase()))
-            .flatMap(arrCtor => {
-                Log.info({"ololo arrCtor": arrCtor + ''});
-                return [];
-            });
+            .flatMap(arrCtor => arrCtor.children())
+            .flatMap(subPsi => subPsi.asPhrase(PhraseType.ArrayInitialiserList))
+            .flatMap(listPsi => listPsi.children())
+            .flatMap(subPsi => subPsi.asPhrase(PhraseType.ArrayElement))
+            .flatMap(elPsi => elPsi.children())
+            .flatMap(subPsi => subPsi.asPhrase(PhraseType.ArrayKey))
+            .flatMap(keyPsi => keyPsi.children())
+            .flatMap(subPsi => subPsi.asToken(TokenType.StringLiteral))
+            .flatMap(strLit => unquote(strLit.text()))
+            .map((label, i) => ({
+                label, sortText: (i + '').padStart(7, '0'),
+                detail: 'deep-assoc FTW',
+            }));
     };
 
     const main = async () => {

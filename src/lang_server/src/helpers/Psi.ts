@@ -2,6 +2,7 @@ import { ParseTreeTraverser } from "intelephense/lib/parseTreeTraverser";
 import { Phrase, Token, TokenType, PhraseType } from "php7parser";
 import { Reference } from "intelephense/lib/reference";
 import { ParsedDocument } from "intelephense/lib/parsedDocument";
+import Log from "../Log";
 
 export type Opt<T> = ([T] | (T[] & []));
 
@@ -15,14 +16,35 @@ const asPhraseNode = (node: Node): Opt<Phrase> => {
     return 'phraseType' in node ? [node] : [];
 };
 
-const describeNode = (node: Phrase | Token | null, doc: ParsedDocument): string => {
+const flattenTokens = (node: Node): Token[] => {
+    if ('children' in node) {
+        return node.children.flatMap(flattenTokens);
+    } else {
+        return [node];
+    }
+};
+
+const getText = (node: Node, doc: ParsedDocument) => {
+    const tokens = flattenTokens(node);
+    const offset = tokens[0].offset;
+    const length = tokens.reduce((sum, t) => sum + t.length, 0);
+    return doc.text.slice(offset, offset + length);
+};
+
+const describeNode = (node: Node | null, doc: ParsedDocument): string => {
     if (!node) {
         return '(no node)';
     } else if ('phraseType' in node) {
-        const subDescrs = node.children.map(subNode => describeNode(subNode, doc));
-        return `${PhraseType[node.phraseType]}(${subDescrs.join(', ')})`;
+        const subDescrs = node.children
+            .map(subNode => describeNode(subNode, doc));
+        const indented = subDescrs
+            .join(',\n')
+            .split('\n')
+            .map(line => '    ' + line)
+            .join('\n');
+        return `${PhraseType[node.phraseType]}(\n${indented}\n)`;
     } else {
-        const text = doc.text.slice(node.offset, node.offset + Math.min(node.length, 20));
+        const text = getText(node, doc).slice(0, 20).trim();
         return `${TokenType[node.tokenType]}(${text}) at ${node.offset}, ${node.length}`;
     }
 };
@@ -102,6 +124,7 @@ const Psi = <T extends Node>({traverser, node, doc}: {
             return describeNode(node, doc);
         },
         eq: other => other.node === node,
+        text: () => getText(node, doc),
     };
 };
 
@@ -115,6 +138,7 @@ interface Psi<T extends Node> {
     reference: Opt<Reference>,
     toString: () => string,
     eq: (other: Psi<Node>) => boolean,
+    text: () => string,
 }
 
 export type IPsi = Psi<Node>;

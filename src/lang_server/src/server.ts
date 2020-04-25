@@ -49,13 +49,7 @@ const addIntelephenseListeners = async (connection: Connection) => {
 
 	connection.onCompletion(
 		async (params: TextDocumentPositionParams): Promise<CompletionItem[]> => {
-			const intelOptions = await Promise.resolve()
-				.then(() => Intelephense.provideCompletions(params.textDocument, params.position))
-				.catch(exc => {
-					Log.info('ololo exc - ' + exc.stack);
-					return Promise.reject(exc);
-				});
-			const options = await AssocKeyPvdr({
+			return AssocKeyPvdr({
 				...Intelephense.getApiTools(),
 				uri: params.textDocument.uri,
 				position: params.position,
@@ -63,12 +57,6 @@ const addIntelephenseListeners = async (connection: Connection) => {
 				Log.info({message: exc.message, stack: exc.stack});
 				return Promise.reject(exc);
 			});
-			await Log.info({msg: 'pidor guzno', intelOptions, ololo: Intelephense.getApiTools().documentStore + ''});
-			return [
-				{label: 'Ololo Optionn', kind: CompletionItemKind.Text, data: 1},
-				{label: 'Guzno Option', kind: CompletionItemKind.Text, data: 2},
-				...options,
-			];
 		}
 	);
 };

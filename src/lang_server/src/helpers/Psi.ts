@@ -8,6 +8,8 @@ export type Opt<T> = ([T] | (T[] & []));
 
 export type Node = Phrase | Token;
 
+export const opt = <T>(nullable?: T): Opt<T> => nullable ? [nullable] : [];
+
 const asTokenNode = (node: Node): Opt<Token> => {
     return 'tokenType' in node ? [node] : [];
 };
@@ -116,6 +118,32 @@ const Psi = <T extends Node>({traverser, node, doc}: {
                 return [];
             }
         },
+        prevSibling: () => {
+            const newTraverser = traverser.clone();
+            newTraverser.prevSibling();
+            if (newTraverser.node) {
+                return [Psi({
+                    traverser: newTraverser,
+                    node: newTraverser.node,
+                    doc,
+                })];
+            } else {
+                return [];
+            }
+        },
+        nextSibling: () => {
+            const newTraverser = traverser.clone();
+            newTraverser.nextSibling();
+            if (newTraverser.node) {
+                return [Psi({
+                    traverser: newTraverser,
+                    node: newTraverser.node,
+                    doc,
+                })];
+            } else {
+                return [];
+            }
+        },
         children: () => asPhrase()
             .flatMap(p => p.node.children)
             .flatMap((node, i) => nthChild(i)),
@@ -134,6 +162,8 @@ interface Psi<T extends Node> {
     asToken: (tokenType?: TokenType) => Opt<Psi<Token>>,
     asPhrase: (...phraseTypes: PhraseType[]) => Opt<Psi<Phrase>>,
     parent: () => Opt<Psi<Phrase>>,
+    prevSibling: () => Opt<IPsi>,
+    nextSibling: () => Opt<IPsi>,
     nthChild: (n: number) => Opt<Psi<Node>>,
     children: () => Psi<Node>[],
     reference: Opt<Reference>,

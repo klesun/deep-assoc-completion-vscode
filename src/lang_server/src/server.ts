@@ -13,6 +13,7 @@ import {
 import { Intelephense } from 'intelephense';
 import Log from './Log';
 import AssocKeyPvdr from './entry/AssocKeyPvdr';
+import ApiCtx from './contexts/ApiCtx';
 
 type Connection = ReturnType<typeof createConnection>;
 
@@ -48,15 +49,13 @@ const addIntelephenseListeners = async (connection: Connection) => {
 	connection.onShutdown(Intelephense.shutdown);
 
 	connection.onCompletion(
-		async (params: TextDocumentPositionParams): Promise<CompletionItem[]> => {
-			return AssocKeyPvdr({
-				...Intelephense.getApiTools(),
+		(params: TextDocumentPositionParams): CompletionItem[] => {
+			const apiTools = Intelephense.getApiTools();
+			const apiCtx = ApiCtx({apiTools});
+			return apiCtx.getPsiAt({
 				uri: params.textDocument.uri,
 				position: params.position,
-			}).catch(exc => {
-				Log.info({message: exc.message, stack: exc.stack});
-				return Promise.reject(exc);
-			});
+			}).flatMap(psi => AssocKeyPvdr({apiCtx, psi}));
 		}
 	);
 };

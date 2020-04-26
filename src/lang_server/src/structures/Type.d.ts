@@ -8,12 +8,14 @@ interface IStr {
     content: string,
 }
 
-interface IRecordArr extends IType {
+export interface IRecordEntry {
+    keyType: Type,
+    valueType: Type,
+}
+
+export interface IRecordArr extends IType {
     kind: 'IRecordArr',
-    entries: Array<{
-        keyType: Type,
-        valueType: Type,
-    }>,
+    entries: IRecordEntry[],
 }
 
 interface IMapArr extends IType {
@@ -42,4 +44,10 @@ interface IAny extends IType {
     kind: 'IAny',
 }
 
-export type Type = IRecordArr | IMapArr | IListArr | ITupleArr | IStr | IMt | IAny;
+interface IFqn extends IType {
+    kind: 'IFqn',
+    fqn: string,
+    generics: Type[],
+}
+
+export type Type = IRecordArr | IMapArr | IListArr | ITupleArr | IFqn | IStr | IMt | IAny;

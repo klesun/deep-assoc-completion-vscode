@@ -8,7 +8,7 @@ export type Opt<T> = ([T] | (T[] & []));
 
 export type Node = Phrase | Token;
 
-export const opt = <T>(nullable?: T): Opt<T> => nullable ? [nullable] : [];
+export const opt = <T>(nullable: T | null): Opt<T> => nullable ? [nullable] : [];
 
 const asTokenNode = (node: Node): Opt<Token> => {
     return 'tokenType' in node ? [node] : [];
@@ -153,6 +153,7 @@ const Psi = <T extends Node>({traverser, node, doc}: {
             return describeNode(node, doc);
         },
         eq: other => other.node === node,
+        // possibly should replace '\r\n' with '\n' on windows here
         text: () => getText(node, doc),
     };
 };

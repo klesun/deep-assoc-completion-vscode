@@ -1,5 +1,6 @@
 {
 	"name": "deep-assoc-completion-vscode",
+	"publisher": "klesun",
 	"author": {
 		"name": "Artur Klesun",
 		"email": "safronevev@gmail.com",
@@ -17,11 +18,22 @@
 		"Linters",
 		"Programming Languages"
 	],
+	"keywords": [
+		"associative arrays",
+		"type inference",
+		"annotate array keys",
+		"php"
+	],
 	"activationEvents": [
 		"onLanguage:php"
 	],
 	"main": "./src/main.js",
-	"icon": "./images/pluginIcon.svg",
+	"icon": "images/svg_256x256.png",
+	"repository": {
+		"type": "git",
+		"url": "git@github.com:klesun/deep-assoc-completion-vscode.git"
+	},
+
 	"contributes": {
 		"commands": [
 			{
@@ -31,7 +43,6 @@
 		]
 	},
 	"scripts": {
-		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
 		"lint": "eslint src --ext ts",
 		"watch": "tsc -watch -p ./",

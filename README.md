@@ -1,26 +1,26 @@
 # deep-assoc-completion for vscode
 
-A yet to be implemented extension for vscode similar to it's [phpstorm counterpart](https://github.com/klesun/deep-assoc-completion)
+vscode repo page: https://marketplace.visualstudio.com/items?itemName=klesun.deep-assoc-completion-vscode
 
-An order we received on https://klesun-productions.com
+An actively developed extension for vscode similar to it's [phpstorm counterpart](https://github.com/klesun/deep-assoc-completion)
 
-Will most likely be based on [vscode-intelephense](https://github.com/bmewburn/vscode-intelephense) as either an additional module or a pull request.
+![](https://user-images.githubusercontent.com/5202330/80292312-84a06080-875e-11ea-8585-d6005cb9beda.png)
+
+This extension is an order we received on https://klesun-productions.com
+
+Uses [vscode-intelephense](https://github.com/bmewburn/vscode-intelephense) for php syntax tree traversal.
 
 Supposedly will achieve this: https://github.com/bmewburn/vscode-intelephense/issues/249
 
-List of features: (yet to be updated)
-- Specify associative array keys in phpdoc for completion and type inference. Either with [PSALM](https://github.com/vimeo/psalm/blob/master/docs/annotating_code/type_syntax/array_types.md#object-like-arrays) format or [deep-assoc](https://github.com/klesun/deep-assoc-completion/issues/63) format, or both.
+List of features implemented so far: (yet to be updated)
+- Specify associative array keys in phpdoc for completion and type inference with [PSALM](https://github.com/vimeo/psalm/blob/master/docs/annotating_code/type_syntax/array_types.md#object-like-arrays) format.
 - Infer array key types
 - Infer function call result types
-- Provide completion and GoTo functionality for array keys
-- Infer types of arguments inside anonymous functions like in `array_map()`
-- Function usage based argument type inference
 - ...
-
 
 # Steps to run
 
-- `git clone` this project
+- `git clone` [this project](git@github.com:klesun/deep-assoc-completion-vscode.git)
 - run `npm ci` (if you forget to do that you'll get `The terminal process terminated with exit code: 1` error)
 - go to `/lang_server` and do `npm ci` once more
 - open this project root in vscode

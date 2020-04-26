@@ -2,6 +2,7 @@
 /out/
 /.idea/
 /.vscode/settings.json
+/*.vsix
 
 /src/lang_server/node_modules/
 /src/lang_server/out/

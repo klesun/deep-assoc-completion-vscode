@@ -33,6 +33,8 @@ const ApiCtx = ({apiTools}: {
         }
     };
 
+    const inProgress = new Set();
+
     let self: IApiCtx;
     return self = {
         getPsiAt: getPsiAt,
@@ -40,7 +42,17 @@ const ApiCtx = ({apiTools}: {
             .findSymbolsByReference(ref, MemberMergeStrategy.None)
             .flatMap(sym => opt(apiTools.symbolStore.symbolLocation(sym)))
             .flatMap(loc => getPsiAt({uri: loc.uri, position: loc.range.end})),
-        resolveExpr: (exprPsi: IPsi) => DirectTypeResolver({exprPsi, apiCtx: self}),
+        resolveExpr: (exprPsi: IPsi) => {
+            if (inProgress.has(exprPsi.node)) {
+                return []; // cyclic reference
+            } else {
+                inProgress.add(exprPsi.node);
+                // TODO: update when switched to iterators
+                const result = DirectTypeResolver({exprPsi, apiCtx: self});
+                inProgress.delete(exprPsi.node);
+                return result;
+            }
+        },
     };
 };
 

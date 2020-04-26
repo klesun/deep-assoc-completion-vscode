@@ -188,7 +188,7 @@ const PsalmTypeExprParser = (text: string) => {
     };
 
     return parseMultiValue().map(type => ({
-        type, textLefT: getTextLeft(),
+        type, textLeft: getTextLeft(),
     }));
 };
 

@@ -12,7 +12,7 @@ import {
 let client: LanguageClient;
 
 const setupLangServer = (context: ExtensionContext) => {
-	const scriptPath = path.join('src', 'lang_server', 'src', 'main.js');
+	const scriptPath = path.join('node_modules', 'deep-assoc-lang-server', 'src', 'main.js');
 	const runOptions = {
 		module: context.asAbsolutePath(scriptPath),
 		transport: TransportKind.ipc,
@@ -25,7 +25,7 @@ const setupLangServer = (context: ExtensionContext) => {
 			options: {
 				// --inspect=6009: runs the server in Node's Inspector mode
 				// so VS Code can attach to the server for debugging
-				execArgv: ['--nolazy', '--inspect=6009']
+				execArgv: ['--inspect=6009']
 			},
 		},
 	};

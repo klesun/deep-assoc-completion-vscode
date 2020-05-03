@@ -9,7 +9,7 @@
 	"license": "MIT",
 	"displayName": "deep-assoc-completion-vscode",
 	"description": "Completion and type inference of associative array keys",
-	"version": "0.1.4",
+	"version": "0.1.6",
 	"engines": {
 		"vscode": "^1.43.0"
 	},
@@ -48,7 +48,7 @@
 		"eslint": "^6.8.0"
 	},
 	"dependencies": {
-		"deep-assoc-lang-server": "git+https://github.com/klesun/deep-assoc-lang-server.git#615c7714bbc48d02af49a13cc9f8595f5158254e",
+		"deep-assoc-lang-server": "git+https://github.com/klesun/deep-assoc-lang-server.git#master",
 		"vscode-languageclient": "latest",
 		"typescript": "^3.7.5",
 		"ts-node": "latest"

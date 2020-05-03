@@ -33,7 +33,7 @@ const setupLangServer = (context: ExtensionContext) => {
 		// Register the server for plain text documents
 		documentSelector: [{ scheme: 'file', language: 'php' }],
 		synchronize: {
-			// Notify the server about file changes to '.clientrc files contained in the workspace
+			// Notify the server about file changes to php files contained in the workspace
 			fileEvents: workspace.createFileSystemWatcher('**/*.php'),
 		},
 	};

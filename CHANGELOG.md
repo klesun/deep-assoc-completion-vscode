@@ -1,6 +1,15 @@
 
 # Change Log
 
+## [0.1.10 - 2020-05-03]
+
+- Show auto-popup when typing func arg keys
+- Add AST ceche debounce, so that there was no more issue of PSI being out of sync with actual text
+
+## [0.1.9 - 2020-05-03]
+
+- Support $arr["someKey"] when resolving types
+
 ## [0.1.8 - 2020-05-03]
 
 - Provide basic completion of function argument array keys

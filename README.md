@@ -22,7 +22,6 @@ vscode repo page: https://marketplace.visualstudio.com/items?itemName=klesun.dee
 
 - `git clone` [this project](https://github.com/klesun/deep-assoc-completion-vscode)
 - run `npm ci` (if you forget to do that you'll get `The terminal process terminated with exit code: 1` error)
-- go to `/lang_server` and do `npm ci` once more
 - open this project root in vscode
 - hit F5 to run sandbox instance of vscode with this extension plugged in
 

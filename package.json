@@ -1,47 +1,11 @@
 {
 	"name": "deep-assoc-completion-vscode",
-	"publisher": "klesun",
-	"author": {
-		"name": "Artur Klesun",
-		"email": "safronevev@gmail.com",
-		"url": "https://klesun-productions.com/"
-	},
-	"license": "MIT",
-	"displayName": "deep-assoc-completion-vscode",
-	"description": "Completion and type inference of associative array keys",
-	"version": "0.1.6",
+	"version": "0.1.7",
 	"engines": {
 		"vscode": "^1.43.0"
 	},
 	"type": "module",
-	"categories": [
-		"Linters",
-		"Programming Languages"
-	],
-	"keywords": [
-		"associative arrays",
-		"type inference",
-		"annotate array keys",
-		"php"
-	],
-	"activationEvents": [
-		"onLanguage:php"
-	],
 	"main": "./src/main.js",
-	"icon": "images/svg_256x256.png",
-	"repository": {
-		"type": "git",
-		"url": "git@github.com:klesun/deep-assoc-completion-vscode.git"
-	},
-	"contributes": {
-		"commands": [
-			{
-				"command": "extension.helloWorld",
-				"title": "deep-assoc-completion-vscode"
-			}
-		]
-	},
-	"scripts": {},
 	"devDependencies": {
 		"@types/node": "^12.11.7",
 		"@types/vscode": "^1.43.0",
@@ -52,5 +16,46 @@
 		"vscode-languageclient": "latest",
 		"typescript": "^3.7.5",
 		"ts-node": "latest"
+	},
+
+	"activationEvents": [
+		"onLanguage:php"
+	],
+	"contributes": {
+		"commands": [
+			{
+				"command": "extension.helloWorld",
+				"title": "deep-assoc-completion-vscode"
+			}
+		]
+	},
+
+	"publisher": "klesun",
+	"author": {
+		"name": "Artur Klesun",
+		"email": "safronevev@gmail.com",
+		"url": "https://klesun-productions.com/"
+	},
+	"license": "MIT",
+	"displayName": "deep-assoc-completion-vscode",
+	"description": "Completion and type inference of associative array keys",
+	"categories": [
+		"Linters",
+		"Programming Languages"
+	],
+	"keywords": [
+		"associative arrays",
+		"type inference",
+		"annotate array keys",
+		"php"
+	],
+	"icon": "images/svg_256x256.png",
+    "bugs": {
+        "url": "https://github.com/klesun/deep-assoc-completion-vscode/issues"
+    },
+    "homepage": "https://klesun-productions.com/entry/deep-assoc-completion-vscode",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/klesun/deep-assoc-completion-vscode"
 	}
 }

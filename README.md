@@ -4,6 +4,8 @@ A work-in-progress extension for vscode similar to it's [phpstorm counterpart](h
 
 ![](https://user-images.githubusercontent.com/5202330/80292312-84a06080-875e-11ea-8585-d6005cb9beda.png)
 
+![image](https://user-images.githubusercontent.com/5202330/80915892-c97b5700-8d5d-11ea-894b-e7d549a7a3d7.png)
+
 Place caret between quotes when typing the associative array key and hit _Ctrl+Space_ to get completions
 
 Supposedly will achieve this: https://github.com/bmewburn/vscode-intelephense/issues/249

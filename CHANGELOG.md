@@ -1,6 +1,10 @@
 
 # Change Log
 
+## [0.2.0 - 2020-05-06]
+
+- Support foreach
+
 ## [0.1.10 - 2020-05-03]
 
 - Show auto-popup when typing func arg keys

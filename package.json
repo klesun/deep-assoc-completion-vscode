@@ -1,6 +1,6 @@
 {
 	"name": "deep-assoc-completion-vscode",
-	"version": "0.1.10",
+	"version": "0.2.0",
 	"engines": {
 		"vscode": "^1.43.0"
 	},
@@ -21,14 +21,6 @@
 	"activationEvents": [
 		"onLanguage:php"
 	],
-	"contributes": {
-		"commands": [
-			{
-				"command": "extension.helloWorld",
-				"title": "deep-assoc-completion-vscode"
-			}
-		]
-	},
 
 	"publisher": "klesun",
 	"author": {

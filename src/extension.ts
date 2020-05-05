@@ -1,6 +1,4 @@
-import * as vscode from 'vscode';
 import { workspace, ExtensionContext } from 'vscode';
-import { completionProvider } from './completionProvider';
 import * as path from 'path';
 import {
 	LanguageClient,
@@ -48,12 +46,6 @@ const setupLangServer = (context: ExtensionContext) => {
 };
 
 export function activate(context: ExtensionContext) {
-	let disposable = vscode.commands.registerCommand('extension.helloWorld', () => {
-		vscode.window.showInformationMessage('deep-assoc-completion-vscode loaded!');
-	});
-	const completion = completionProvider();
-	context.subscriptions.push(disposable, completion);
-
 	setupLangServer(context);
 }
 

@@ -27,6 +27,8 @@ vscode repo page: https://marketplace.visualstudio.com/items?itemName=klesun.dee
 - open this project root in vscode
 - hit F5 to run sandbox instance of vscode with this extension plugged in
 
+If you are getting irrelevant global keywords in key completion, you most likely want to untick the _PHP > Suggest: Basic_ in vscode Preferences
+
 # Misc
 
 Smoke Tests repository: https://github.com/klesun-misc/deep-assoc-completion-vscode-smoke-tests

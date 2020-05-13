@@ -6,11 +6,22 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Ololo Run With deep-assoc",
+			"name": "Debug deep-assoc",
 			"type": "extensionHost",
 			"request": "launch",
 			"runtimeExecutable": "${execPath}",
 			"args": ["--extensionDevelopmentPath=${workspaceFolder}"]
+		},
+		{
+			"name": "Language Server E2E Test",
+			"type": "extensionHost",
+			"request": "launch",
+			"runtimeExecutable": "${execPath}",
+			"args": [
+				"--extensionDevelopmentPath=${workspaceRoot}",
+				"--extensionTestsPath=${workspaceRoot}/src/test",
+				"${workspaceRoot}/client/testFixture"
+			]
 		}
 	]
 }

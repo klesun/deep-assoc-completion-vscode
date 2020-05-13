@@ -23,7 +23,7 @@ const setupLangServer = (context: ExtensionContext) => {
 			options: {
 				// --inspect=6009: runs the server in Node's Inspector mode
 				// so VS Code can attach to the server for debugging
-				execArgv: ['--inspect=6009']
+				execArgv: ['--nolazy', '--inspect=6009']
 			},
 		},
 	};

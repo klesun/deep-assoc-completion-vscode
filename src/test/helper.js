@@ -17,7 +17,7 @@ exports.activate = async function(docUri) {
         // reporting that server is ready...
         // 2165 - too little
         // 2166 - too much
-        await sleep(2166); // Wait for server activation
+        await sleep(3000); // Wait for server activation
     } catch (e) {
         console.error(e);
     }
@@ -28,7 +28,7 @@ async function sleep(ms) {
 }
 
 const getDocPath = (p) => {
-    return path.resolve(__dirname, '../../testFixture', p);
+    return path.resolve(__dirname, '../../node_modules/deep-assoc-lsp-tests/testFixture', p);
 };
 exports.getDocUri = (p) => {
     return vscode.Uri.file(getDocPath(p));

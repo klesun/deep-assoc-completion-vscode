@@ -20,7 +20,7 @@
 			"args": [
 				"--extensionDevelopmentPath=${workspaceRoot}",
 				"--extensionTestsPath=${workspaceRoot}/src/test",
-				"${workspaceRoot}/client/testFixture"
+				"${workspaceRoot}/node_modules/deep-assoc-lsp-tests/testFixture"
 			]
 		}
 	]

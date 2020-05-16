@@ -31,7 +31,7 @@ If you are getting irrelevant global keywords in key completion, you most likely
 
 # Misc
 
-Smoke Tests repository: https://github.com/klesun-misc/deep-assoc-completion-vscode-smoke-tests
+Smoke Tests repository: https://github.com/klesun-misc/deep-assoc-lsp-tests
 
 ______________________________________________
 

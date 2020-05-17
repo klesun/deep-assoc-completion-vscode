@@ -61,7 +61,9 @@ const SubscribeForIndexing = ({languageClient, extensionContext}: {
 		let indexingStartHrtime = process.hrtime();
 		languageClient.info('Indexing started.');
 		let completedPromise = workspaceDiscovery.checkCacheThenDiscover(uriArray, checkModTime, token).then((count) => {
-			window.setStatusBarMessage('$(search) deep-assoc indexing done: ' + count);
+			const msg = '$(search) deep-assoc indexing done: ' + count;
+			window.setStatusBarMessage(msg);
+			console.debug(msg);
 			indexingCompleteFeedback(indexingStartHrtime, count, token);
 		}).catch(exc => {
 			window.setStatusBarMessage('deep-assoc index exc', exc);

@@ -17,7 +17,7 @@ exports.activate = async function(docUri) {
         // reporting that server is ready...
         // 2165 - too little
         // 2166 - too much
-        await sleep(3000); // Wait for server activation
+        await sleep(5000); // Wait for server activation
     } catch (e) {
         console.error(e);
     }

@@ -24,33 +24,38 @@ const parseTestCases = (fileText) => {
     return testCases;
 };
 
-suite('Should do completion', () => {
-    const docUri = getDocUri('completion.php');
-    const whenActive = activate(docUri);
-    const fileBuffer = fs.readFileSync(docUri.path.replace(/^\/[a-z]:\//, '/'));
-    const testCases = parseTestCases(fileBuffer.toString());
-
-    for (const {position, items} of testCases) {
-        const title = 'at ' + position.line + ':' + position.character +
-            ', expected: ' + items.map(i => i.label).join(', ');
-        test(title, async () => {
-            await whenActive;
-            await testCompletion(docUri, position, {items});
-        });
-    }
-});
-
 async function testCompletion(docUri, position, expectedCompletionList) {
     // Executing the command `vscode.executeCompletionItemProvider` to simulate triggering completion
     const actualCompletionList = (await vscode.commands.executeCommand(
         'vscode.executeCompletionItemProvider', docUri, position
     ));
 
+    const msg = 'actual: ' + (actualCompletionList.items.map(i => i.label).join(', ') || '(no items)');
+    assert.ok(actualCompletionList.items.length === expectedCompletionList.items.length, msg);
     expectedCompletionList.items.forEach((expectedItem, i) => {
         const actualItem = actualCompletionList.items[i];
         assert.equal(actualItem.label, expectedItem.label);
         assert.equal(actualItem.kind, expectedItem.kind);
     });
-    const msg = actualCompletionList.items.map(i => i.label).join(', ');
-    assert.ok(actualCompletionList.items.length === expectedCompletionList.items.length, msg);
 }
+
+const processTestFile = fileName => {
+    suite('Should do completion in ' + fileName, () => {
+        const docUri = getDocUri(fileName);
+        const whenActive = activate(docUri);
+        const fileBuffer = fs.readFileSync(docUri.path.replace(/^\/[a-z]:\//, '/'));
+        const testCases = parseTestCases(fileBuffer.toString());
+
+        for (const {position, items} of testCases) {
+            const title = 'at ' + position.line + ':' + position.character +
+                ', expected: ' + items.map(i => i.label).join(', ');
+            test(title, async () => {
+                await whenActive;
+                await testCompletion(docUri, position, {items});
+            });
+        }
+    });
+};
+
+// processTestFile('DeepAssocTests/completion.php');
+processTestFile('DeepAssocTests/UnitTest.php');

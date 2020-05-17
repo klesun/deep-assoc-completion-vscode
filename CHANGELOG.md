@@ -1,6 +1,10 @@
 
 # Change Log
 
+## [0.2.4 - 2020-05-18]
+
+- Oh, damn, you need to run `npm update` when your dependency points to master
+
 ## [0.2.3 - 2020-05-18]
 
 - Forgot to `npm i` the fix

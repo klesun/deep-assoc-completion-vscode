@@ -1,6 +1,10 @@
 
 # Change Log
 
+## [0.2.5 - 2020-05-18]
+
+- Exclude typescript lib files not required by ts-node from extension package
+
 ## [0.2.4 - 2020-05-18]
 
 - Oh, damn, you need to run `npm update` when your dependency points to master

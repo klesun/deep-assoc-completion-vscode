@@ -7,12 +7,14 @@
 	"type": "module",
 	"main": "./src/main.js",
 	"devDependencies": {
+		"@types/fs-extra": "^5.0.0",
 		"@types/node": "^12.11.7",
 		"@types/vscode": "^1.43.0",
 		"deep-assoc-lsp-tests": "git+https://github.com/klesun-misc/deep-assoc-lsp-tests.git#master",
 		"mocha": "^6.2.2"
 	},
 	"dependencies": {
+		"fs-extra": "^5.0.0",
 		"deep-assoc-lang-server": "git+https://github.com/klesun/deep-assoc-lang-server.git#master",
 		"vscode-languageclient": "latest",
 		"typescript": "^3.7.5",

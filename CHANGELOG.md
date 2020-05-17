@@ -1,6 +1,10 @@
 
 # Change Log
 
+## [0.2.2 - 2020-05-18]
+
+- Fix, do not flood CPU with errors of logs directory being missing
+
 ## [0.2.1 - 2020-05-18]
 
 - Fix, completion from other files did not work unless you opened them

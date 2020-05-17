@@ -6,6 +6,7 @@ import {
 	ServerOptions,
 	TransportKind
 } from 'vscode-languageclient';
+import SubscribeForIndexing from './SubscribeForIndexing';
 
 let client: LanguageClient;
 
@@ -41,12 +42,19 @@ const setupLangServer = (context: ExtensionContext) => {
 		serverOptions,
 		clientOptions
 	);
-	client.start();
-	client.onReady();
+	const langClientDisposable = client.start();
+	context.subscriptions.push(langClientDisposable);
+
+	const indexingDisposables = SubscribeForIndexing({
+		languageClient: client, extensionContext: context,
+	});
+	context.subscriptions.push(...indexingDisposables);
+
+	return client.onReady();
 };
 
 export function activate(context: ExtensionContext) {
-	setupLangServer(context);
+	return setupLangServer(context);
 }
 
 // this method is called when your extension is deactivated

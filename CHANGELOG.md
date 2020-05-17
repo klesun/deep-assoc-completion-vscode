@@ -1,6 +1,11 @@
 
 # Change Log
 
+## [0.2.1 - 2020-05-18]
+
+- Fix, completion from other files did not work unless you opened them
+- Support tuple arrays and track associative array value types
+
 ## [0.2.0 - 2020-05-06]
 
 - Support foreach

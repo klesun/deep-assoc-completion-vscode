@@ -14,11 +14,11 @@
 		"mocha": "^6.2.2"
 	},
 	"dependencies": {
-		"fs-extra": "^5.0.0",
 		"deep-assoc-lang-server": "git+https://github.com/klesun/deep-assoc-lang-server.git#master",
-		"vscode-languageclient": "latest",
+		"fs-extra": "^5.0.0",
+		"ts-node": "latest",
 		"typescript": "^3.7.5",
-		"ts-node": "latest"
+		"vscode-languageclient": "latest"
 	},
 	"activationEvents": [
 		"onLanguage:php"

@@ -1,6 +1,10 @@
 
 # Change Log
 
+## [0.3.0 - 2020-05-18]
+
+- Add string value === completion
+
 ## [0.2.5 - 2020-05-18]
 
 - Exclude typescript lib files not required by ts-node from extension package

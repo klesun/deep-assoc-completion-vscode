@@ -29,7 +29,7 @@ const execOrFail = async (cmd) => {
     const {stdout, stderr, code} = await exec(cmd);
     console.debug('executing: ' + cmd, {stdout, stderr});
     if (stderr.trim() && code !== 0) {
-        const error = new Error('Failed to exec `' + cmd + '` - ' + stderr);
+        const error = new Error('Failed to exec `' + cmd + '` code: ' + code + ' - ' + stderr);
         error.stdout = stdout;
         error.stderr = stderr;
         throw error;

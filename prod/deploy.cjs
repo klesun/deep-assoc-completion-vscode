@@ -26,7 +26,7 @@ const collectParams = () => {
 };
 
 const execOrFail = async (cmd) => {
-    const {stdout, stderr} = await exec('npm version ' + params['-v'][0]);
+    const {stdout, stderr} = await exec(cmd);
     if (stderr.trim()) {
         throw new Error('Failed to exec `' + cmd + '` - ' + stderr);
     } else {

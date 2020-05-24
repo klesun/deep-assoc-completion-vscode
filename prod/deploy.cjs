@@ -51,6 +51,7 @@ const main = async () => {
                     ? exc.stdout : Promise.reject(exc);
             });
         await execOrFail('npm update deep-assoc-lang-server');
+        // TODO: add unit tests eventually
         await execOrFail('npm i --only=production');
 
         const changelogPath = __dirname + '/../CHANGELOG.md';
@@ -60,7 +61,6 @@ const main = async () => {
             `## [${newVersion} - ${date}]`,
             ``,
             ...messages.map(m => '- ' + m),
-            ``,
             ``,
         ]);
         await fs.writeFile(changelogPath, changeLogLines.join('\n'));

@@ -54,7 +54,7 @@ const main = async () => {
         await execOrFail('npm i --only=production');
 
         const changelogPath = __dirname + '/../CHANGELOG.md';
-        const changeLogLines = (await fs.readFile())
+        const changeLogLines = (await fs.readFile(changelogPath))
             .toString().split('\n');
         changeLogLines.splice(3, 0, ...[
             `## [${newVersion} - ${date}]`,

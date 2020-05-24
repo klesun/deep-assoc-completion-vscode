@@ -15,7 +15,7 @@ const collectParams = () => {
     if (!params['-v']) {
         throw new Error('-v parameter (version: patch/minor) is mandatory');
     }
-    if (['patch', 'minor'].includes(params['-v'][0])) {
+    if (!['patch', 'minor'].includes(params['-v'][0])) {
         throw new Error('-v parameter must be one of: patch/minor, but you provided: ' + params['-v'][0]);
     }
     if (!params['-m'] || !params['-m'][0].trim()) {

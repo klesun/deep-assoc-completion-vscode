@@ -42,9 +42,7 @@ const main = async () => {
     const params = collectParams();
     const newVersion = (await execOrFail('npm version ' + params['-v'][0])).trim();
     const date = new Date().toISOString().slice(0, 10);
-    const quotedMessages = params['-m'];
-
-    console.debug('quoted messages', quotedMessages);
+    const messages = params['-m'];
 
     const processVersion = async () => {
         await execOrFail('git pull origin master')
@@ -61,16 +59,16 @@ const main = async () => {
         changeLogLines.splice(3, 0, ...[
             `## [${newVersion} - ${date}]`,
             ``,
-            ...quotedMessages.map(m => '- ' + eval(m)),
+            ...messages.map(m => '- ' + m),
             ``,
             ``,
         ]);
         await fs.writeFile(changelogPath, changeLogLines.join('\n'));
 
-        const mainMsg = newVersion + ' - ' + quotedMessages.splice(0, 1)[0];
+        const mainMsg = newVersion + ' - ' + messages.splice(0, 1)[0];
         const commitCmd = 'git commit --amend -m ' + 
             JSON.stringify(mainMsg) + q
-            uotedMessages.map(m => ' -m ' + m).join('');
+            messages.map(m => ' -m ' + JSON.stringify(m)).join('');
         await execOrFail(commitCmd);
 
         //await execOrFail('git push origin master');

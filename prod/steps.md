@@ -5,5 +5,4 @@ should automate eventually...
 - run `npm i --only=production`
 - update CHANGELOG
 - commit and push
-- run `node /c/Users/User/AppData/Roaming/npm/node_modules/vsce/out/vsce package`
 - run `node /c/Users/User/AppData/Roaming/npm/node_modules/vsce/out/vsce publish`

@@ -25,34 +25,24 @@ const collectParams = () => {
     return params;
 };
 
-const execOrFail = async (cmd) => {
-    const {stdout, stderr, code} = await exec(cmd);
-    console.debug('executing: ' + cmd, {stdout, stderr});
-    if (stderr.trim() && code !== 0) {
-        const error = new Error('Failed to exec `' + cmd + '` code: ' + code + ' - ' + stderr);
-        error.stdout = stdout;
-        error.stderr = stderr;
-        throw error;
-    } else {
-        return stdout;
-    }
+const execAndLog = async (cmd) => {
+    const result = await exec(cmd);
+    console.log('executing: ' + cmd, result);
+    return result;
 };
 
 const main = async () => {
     const params = collectParams();
-    const newVersion = (await execOrFail('npm version ' + params['-v'][0])).trim();
+    const newVersionResult = await execAndLog('npm version ' + params['-v'][0]);
+    const newVersion = newVersionResult.stdout.trim();
     const date = new Date().toISOString().slice(0, 10);
     const messages = params['-m'];
 
     const processVersion = async () => {
-        await execOrFail('git pull origin master')
-            .catch(exc => {
-                return exc.stdout.trim() === 'Already up to date.'
-                    ? exc.stdout : Promise.reject(exc);
-            });
-        await execOrFail('npm update deep-assoc-lang-server');
+        await execAndLog('git pull origin master');
+        await execAndLog('npm update deep-assoc-lang-server');
         // TODO: add unit tests eventually
-        await execOrFail('npm i --only=production');
+        await execAndLog('npm i --only=production');
 
         const changelogPath = __dirname + '/../CHANGELOG.md';
         const changeLogLines = (await fs.readFile(changelogPath))
@@ -65,18 +55,18 @@ const main = async () => {
         ]);
         await fs.writeFile(changelogPath, changeLogLines.join('\n'));
 
-        await execOrFail('git add ' + changelogPath);
-        await execOrFail('git add package.json');
-        await execOrFail('git add package-lock.json');
+        await execAndLog('git add ' + changelogPath);
+        await execAndLog('git add package.json');
+        await execAndLog('git add package-lock.json');
 
         const mainMsg = newVersion + ' - ' + messages.splice(0, 1)[0];
         const commitCmd = 'git commit --amend -m ' + 
             JSON.stringify(mainMsg) +
             messages.map(m => ' -m ' + JSON.stringify(m)).join('');
-        await execOrFail(commitCmd);
+        await execAndLog(commitCmd);
 
-        await execOrFail('git push origin master');
-        await execOrFail('node /c/Users/User/AppData/Roaming/npm/node_modules/vsce/out/vsce publish');
+        await execAndLog('git push origin master');
+        await execAndLog('node /c/Users/User/AppData/Roaming/npm/node_modules/vsce/out/vsce publish');
     };
     
     return processVersion().catch(async exc => {

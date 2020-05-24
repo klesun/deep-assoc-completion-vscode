@@ -65,6 +65,10 @@ const main = async () => {
         ]);
         await fs.writeFile(changelogPath, changeLogLines.join('\n'));
 
+        await execOrFail('git add ' + changelogPath);
+        await execOrFail('git add package.json');
+        await execOrFail('git add package-lock.json');
+
         const mainMsg = newVersion + ' - ' + messages.splice(0, 1)[0];
         const commitCmd = 'git commit --amend -m ' + 
             JSON.stringify(mainMsg) +

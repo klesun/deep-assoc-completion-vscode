@@ -29,7 +29,10 @@ const execOrFail = async (cmd) => {
     const {stdout, stderr} = await exec(cmd);
     console.debug('executing: ' + cmd, {stdout, stderr});
     if (stderr.trim()) {
-        throw new Error('Failed to exec `' + cmd + '` - ' + stderr);
+        const error = new Error('Failed to exec `' + cmd + '` - ' + stderr);
+        error.stdout = stdout;
+        error.stderr = stderr;
+        throw error;
     } else {
         return stdout;
     }
@@ -41,30 +44,42 @@ const main = async () => {
     const date = new Date().toISOString().slice(0, 10);
     const quotedMessages = params['-m'];
 
-    await execOrFail('git pull origin master');
-    await execOrFail('npm update deep-assoc-lang-server');
-    await execOrFail('npm i --only=production');
+    const processVersion = async () => {
+        await execOrFail('git pull origin master')
+            .catch(exc => {
+                return exc.stdout.trim() === 'Already up to date.'
+                    ? exc.stdout : Promise.reject(exc);
+            });
+        await execOrFail('npm update deep-assoc-lang-server');
+        await execOrFail('npm i --only=production');
 
-    const changelogPath = __dirname + '/../CHANGELOG.md';
-    const changeLogLines = (await fs.readFile())
-        .toString().split('\n');
-    changeLogLines.splice(3, 0, ...[
-        `## [${newVersion} - ${date}]`,
-        ``,
-        ...quotedMessages.map(m => '- ' + eval(m)),
-        ``,
-        ``,
-    ]);
-    await fs.writeFile(changelogPath, changeLogLines.join('\n'));
+        const changelogPath = __dirname + '/../CHANGELOG.md';
+        const changeLogLines = (await fs.readFile())
+            .toString().split('\n');
+        changeLogLines.splice(3, 0, ...[
+            `## [${newVersion} - ${date}]`,
+            ``,
+            ...quotedMessages.map(m => '- ' + eval(m)),
+            ``,
+            ``,
+        ]);
+        await fs.writeFile(changelogPath, changeLogLines.join('\n'));
 
-    const mainMsg = 'v' + newVersion + ' - ' + quotedMessages.splice(0, 1)[0];
-    const commitCmd = 'git commit --amend -m ' + 
-        JSON.stringify(mainMsg) + q
-        uotedMessages.map(m => ' -m ' + m).join('');
-    await execOrFail(commitCmd);
+        const mainMsg = 'v' + newVersion + ' - ' + quotedMessages.splice(0, 1)[0];
+        const commitCmd = 'git commit --amend -m ' + 
+            JSON.stringify(mainMsg) + q
+            uotedMessages.map(m => ' -m ' + m).join('');
+        await execOrFail(commitCmd);
 
-    //await execOrFail('git push origin master');
-    //await execOrFail('node /c/Users/User/AppData/Roaming/npm/node_modules/vsce/out/vsce publish');
+        //await execOrFail('git push origin master');
+        //await execOrFail('node /c/Users/User/AppData/Roaming/npm/node_modules/vsce/out/vsce publish');
+    };
+    
+    return processVersion().catch(exc => {
+        await exec('git reset --hard HEAD~1');
+        await exec('git tag -d v' + newVersion);
+        return Promise.reject(exc);
+    });
 };
 
 main()

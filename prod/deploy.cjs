@@ -40,7 +40,7 @@ const execOrFail = async (cmd) => {
 
 const main = async () => {
     const params = collectParams();
-    const newVersion = await execOrFail('npm version ' + params['-v'][0]);
+    const newVersion = (await execOrFail('npm version ' + params['-v'][0])).trim();
     const date = new Date().toISOString().slice(0, 10);
     const quotedMessages = params['-m'];
 
@@ -65,7 +65,7 @@ const main = async () => {
         ]);
         await fs.writeFile(changelogPath, changeLogLines.join('\n'));
 
-        const mainMsg = 'v' + newVersion + ' - ' + quotedMessages.splice(0, 1)[0];
+        const mainMsg = newVersion + ' - ' + quotedMessages.splice(0, 1)[0];
         const commitCmd = 'git commit --amend -m ' + 
             JSON.stringify(mainMsg) + q
             uotedMessages.map(m => ' -m ' + m).join('');
@@ -77,7 +77,7 @@ const main = async () => {
     
     return processVersion().catch(async exc => {
         await exec('git reset --hard HEAD~1');
-        await exec('git tag -d v' + newVersion);
+        await exec('git tag -d ' + newVersion);
         return Promise.reject(exc);
     });
 };

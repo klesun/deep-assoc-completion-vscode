@@ -75,8 +75,8 @@ const main = async () => {
             messages.map(m => ' -m ' + JSON.stringify(m)).join('');
         await execOrFail(commitCmd);
 
-        //await execOrFail('git push origin master');
-        //await execOrFail('node /c/Users/User/AppData/Roaming/npm/node_modules/vsce/out/vsce publish');
+        await execOrFail('git push origin master');
+        await execOrFail('node /c/Users/User/AppData/Roaming/npm/node_modules/vsce/out/vsce publish');
     };
     
     return processVersion().catch(async exc => {

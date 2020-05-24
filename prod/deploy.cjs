@@ -75,7 +75,7 @@ const main = async () => {
         //await execOrFail('node /c/Users/User/AppData/Roaming/npm/node_modules/vsce/out/vsce publish');
     };
     
-    return processVersion().catch(exc => {
+    return processVersion().catch(async exc => {
         await exec('git reset --hard HEAD~1');
         await exec('git tag -d v' + newVersion);
         return Promise.reject(exc);

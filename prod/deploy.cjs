@@ -57,7 +57,7 @@ const main = async () => {
     await fs.writeFile(changelogPath, changeLogLines.join('\n'));
 
     const mainMsg = 'v' + newVersion + ' - ' + quotedMessages.splice(0, 1)[0];
-    const commitCmd = 'git commit --amend -m ' +
+    const commitCmd = 'git commit --amend -m ' + 
         JSON.stringify(mainMsg) + q
         uotedMessages.map(m => ' -m ' + m).join('');
     await execOrFail(commitCmd);

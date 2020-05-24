@@ -44,6 +44,8 @@ const main = async () => {
     const date = new Date().toISOString().slice(0, 10);
     const quotedMessages = params['-m'];
 
+    console.debug('quoted messages', quotedMessages);
+
     const processVersion = async () => {
         await execOrFail('git pull origin master')
             .catch(exc => {

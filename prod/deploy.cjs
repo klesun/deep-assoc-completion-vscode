@@ -67,7 +67,7 @@ const main = async () => {
 
         const mainMsg = newVersion + ' - ' + messages.splice(0, 1)[0];
         const commitCmd = 'git commit --amend -m ' + 
-            JSON.stringify(mainMsg) + q
+            JSON.stringify(mainMsg) +
             messages.map(m => ' -m ' + JSON.stringify(m)).join('');
         await execOrFail(commitCmd);
 

@@ -1,6 +1,11 @@
 
 # Change Log
 
+## [v0.4.0 - 2020-05-24]
+
+- Support psalm @return type
+- Support psalm param type for methods as well, not just script functions
+
 ## [0.3.0 - 2020-05-18]
 
 - Add string value === completion

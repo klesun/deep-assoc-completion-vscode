@@ -27,6 +27,7 @@ const collectParams = () => {
 
 const execOrFail = async (cmd) => {
     const {stdout, stderr} = await exec(cmd);
+    console.debug('executing: ' + cmd, {stdout, stderr});
     if (stderr.trim()) {
         throw new Error('Failed to exec `' + cmd + '` - ' + stderr);
     } else {

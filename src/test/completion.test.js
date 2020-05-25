@@ -5,7 +5,7 @@ const fs = require('fs');
 
 const parseTestCases = (fileText) => {
     const testCases = [];
-    const regex = /\\\/\s*should\s+suggest:\s*(\w+(?:\s*,\s*\w+)*)/g;
+    const regex = /\\\/\s*should\s+suggest:\s*([\w\-]+(?:\s*,\s*[\w\-]+)*)/g;
     for (const match of fileText.matchAll(regex)) {
         const {index} = match;
         const [, joinedWords] = match;
@@ -16,26 +16,22 @@ const parseTestCases = (fileText) => {
         const character = lines.slice(-1)[0].length + 1;
         testCases.push({
             position: new vscode.Position(line, character),
-            items: joinedWords.split(/\s*\,\s*/).map(label => ({
-                label, kind: vscode.CompletionItemKind.Field,
-            })),
+            items: joinedWords.split(/\s*\,\s*/).map(label => ({label})),
         });
     }
     return testCases;
 };
 
 async function testCompletion(docUri, position, expectedCompletionList) {
-    // Executing the command `vscode.executeCompletionItemProvider` to simulate triggering completion
-    const actualCompletionList = (await vscode.commands.executeCommand(
+    const actualItems = (await vscode.commands.executeCommand(
         'vscode.executeCompletionItemProvider', docUri, position
-    ));
+    )).items.filter(i => JSON.stringify(i).includes('deep-assoc'));
 
-    const msg = 'actual: ' + (actualCompletionList.items.map(i => i.label).join(', ') || '(no items)');
-    assert.ok(actualCompletionList.items.length === expectedCompletionList.items.length, msg);
+    const msg = 'actual: ' + (actualItems.map(i => i.label).join(', ') || '(no items)');
+    assert.ok(actualItems.length === expectedCompletionList.items.length, msg);
     expectedCompletionList.items.forEach((expectedItem, i) => {
-        const actualItem = actualCompletionList.items[i];
+        const actualItem = actualItems[i];
         assert.equal(actualItem.label, expectedItem.label);
-        assert.equal(actualItem.kind, expectedItem.kind);
     });
 }
 

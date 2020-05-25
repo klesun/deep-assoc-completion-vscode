@@ -1,6 +1,36 @@
 
 # Change Log
 
+## [v0.4.0 - 2020-05-24]
+
+- Support psalm @return type
+- Support psalm param type for methods as well, not just script functions
+
+## [0.3.0 - 2020-05-18]
+
+- Add string value === completion
+
+## [0.2.5 - 2020-05-18]
+
+- Exclude typescript lib files not required by ts-node from extension package
+
+## [0.2.4 - 2020-05-18]
+
+- Oh, damn, you need to run `npm update` when your dependency points to master
+
+## [0.2.3 - 2020-05-18]
+
+- Forgot to `npm i` the fix
+
+## [0.2.2 - 2020-05-18]
+
+- Fix, do not flood CPU with errors of logs directory being missing
+
+## [0.2.1 - 2020-05-18]
+
+- Fix, completion from other files did not work unless you opened them
+- Support tuple arrays and track associative array value types
+
 ## [0.2.0 - 2020-05-06]
 
 - Support foreach

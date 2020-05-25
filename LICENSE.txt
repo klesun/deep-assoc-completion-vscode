@@ -1,6 +1,4 @@
 
-deep-assoc-completion-vscode (applies to both client and server parts of the extension)
-
 MIT License
 
 Copyright (c) 2020 - present Artur Klesun arturklesun@gmail.com

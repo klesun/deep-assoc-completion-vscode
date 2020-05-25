@@ -3,3 +3,13 @@
 /out/**
 vsc-extension-quickstart.md
 **/*.map
+
+node_modules/typescript/lib/tsserver.js
+node_modules/typescript/lib/tsserverlibrary.js
+node_modules/typescript/lib/typescriptServices.js
+node_modules/typescript/lib/typingsInstaller.js
+node_modules/typescript/lib/tsc.js
+node_modules/typescript/lib/*.d.ts
+node_modules/typescript/lib/*.json
+node_modules/typescript/lib/*/**
+node_modules/typescript/loc/

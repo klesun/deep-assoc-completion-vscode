@@ -1,6 +1,13 @@
 
 # Change Log
 
+## [v0.5.0 - 2020-05-25]
+
+- Add support for @psalm-import-type
+- Add support for @psalm-type
+- Parse traditional Type[] phpdoc annotation as well
+- Handle first method doc comment being outside of the ClassMemberDeclarationList parent
+
 ## [v0.4.0 - 2020-05-24]
 
 - Support psalm @return type

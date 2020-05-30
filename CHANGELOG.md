@@ -1,6 +1,10 @@
 
 # Change Log
 
+## [v0.6.0 - 2020-05-30]
+
+- Support aliases in imported types
+
 ## [v0.5.0 - 2020-05-25]
 
 - Add support for @psalm-import-type

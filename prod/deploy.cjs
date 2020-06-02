@@ -66,7 +66,8 @@ const main = async () => {
         await execAndLog(commitCmd);
 
         await execAndLog('git push origin master');
-        await execAndLog('node /Users/User/AppData/Roaming/npm/node_modules/vsce/out/vsce publish');
+        await execAndLog('vsce publish');
+        //await execAndLog('node /Users/User/AppData/Roaming/npm/node_modules/vsce/out/vsce publish');
     };
     
     return processVersion().catch(async exc => {

@@ -1,6 +1,4 @@
 {
 	"recommendations": [
-		"breezelin.phpstan",
-		"bmewburn.vscode-intelephense-client"
 	]
 }

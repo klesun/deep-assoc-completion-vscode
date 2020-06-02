@@ -54,6 +54,10 @@ const setupLangServer = (context: ExtensionContext) => {
 };
 
 export function activate(context: ExtensionContext) {
+	// leaving this setting at default value `true` would've caused global keywords
+	// being suggested _everywhere_ including when caret is between quotes of array key
+	workspace.getConfiguration().update('php.suggest.basic', false);
+
 	return setupLangServer(context);
 }
 

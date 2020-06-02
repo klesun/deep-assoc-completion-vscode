@@ -2,7 +2,7 @@
 
 A work-in-progress extension for vscode similar to it's [phpstorm counterpart](https://plugins.jetbrains.com/plugin/9927-deep-assoc-completion)
 
-If you are getting irrelevant global keywords in key completion, you most likely want to untick the _PHP > Suggest: Basic_ in vscode Preferences
+If you are getting irrelevant global keywords in key completion, you most likely want to untick the _PHP > Suggest: Basic_ in vscode Preferences (`php.suggest.basic`)
 
 ![](https://user-images.githubusercontent.com/5202330/80292312-84a06080-875e-11ea-8585-d6005cb9beda.png)
 

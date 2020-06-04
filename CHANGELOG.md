@@ -1,6 +1,18 @@
 
 # Change Log
 
+## [v0.8.0 - 2020-06-04]
+
+- Support key assignment to a var
+
+## [v0.7.0 - 2020-06-04]
+
+- Support vars assigned in if-else branches and loops
+
+## [v0.7.0 - 2020-06-02]
+
+- Override `php.suggest.basic` IDE config to disable irrelevant global completions in php files
+
 ## [v0.6.0 - 2020-05-30]
 
 - Support aliases in imported types

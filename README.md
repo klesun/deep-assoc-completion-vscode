@@ -2,6 +2,8 @@
 
 A work-in-progress extension for vscode similar to it's [phpstorm counterpart](https://plugins.jetbrains.com/plugin/9927-deep-assoc-completion)
 
+If you are getting irrelevant global keywords in key completion, you most likely want to untick the _PHP > Suggest: Basic_ in vscode Preferences (`php.suggest.basic`)
+
 ![](https://user-images.githubusercontent.com/5202330/80292312-84a06080-875e-11ea-8585-d6005cb9beda.png)
 
 ![image](https://user-images.githubusercontent.com/5202330/80915892-c97b5700-8d5d-11ea-894b-e7d549a7a3d7.png)
@@ -27,7 +29,6 @@ vscode repo page: https://marketplace.visualstudio.com/items?itemName=klesun.dee
 - open this project root in vscode
 - hit F5 to run sandbox instance of vscode with this extension plugged in
 
-If you are getting irrelevant global keywords in key completion, you most likely want to untick the _PHP > Suggest: Basic_ in vscode Preferences
 
 # Misc
 

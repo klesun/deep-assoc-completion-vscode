@@ -15,8 +15,7 @@ const setupLangServer = (context: ExtensionContext) => {
 	const runOptions = {
 		module: context.asAbsolutePath(scriptPath),
 		transport: TransportKind.ipc,
-		// for es6 imports in js files
-		args: ['--experimental-modules'],
+		args: [],
 	};
 	const serverOptions: ServerOptions = {
 		run: runOptions,

@@ -4,7 +4,6 @@
 	"engines": {
 		"vscode": "^1.43.0"
 	},
-	"type": "module",
 	"main": "./src/main.js",
 	"devDependencies": {
 		"@types/fs-extra": "^5.0.0",

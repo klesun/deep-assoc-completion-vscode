@@ -22,6 +22,15 @@
 				"--extensionTestsPath=${workspaceRoot}/src/test",
 				"${workspaceRoot}/node_modules/deep-assoc-lsp-tests/testFixture"
 			]
+		},
+		{
+			"name": "Attach",
+			"port": 6009,
+			"request": "attach",
+			"skipFiles": [
+				"<node_internals>/**"
+			],
+			"type": "pwa-node"
 		}
 	]
 }

@@ -1,6 +1,18 @@
 
 # Change Log
 
+## [v0.8.1 - 2022-03-20]
+
+- Fix, plugin failed to activate starting from vdcode v1.53 due to .js defaulting to es6 imports by default in newer versions of node
+
+## [v0.8.1 - 2022-03-20]
+
+- Fix, plugin failed to activate starting from vdcode v1.53 due to .js defaulting to es6 imports by default in newer versions of node
+
+## [v0.8.1 - 2022-03-20]
+
+- Fix, plugin failed to activate starting from vdcode v1.53 due to .js defaulting to es6 imports by default in newer versions of node
+
 ## [v0.8.0 - 2020-06-04]
 
 - Support key assignment to a var

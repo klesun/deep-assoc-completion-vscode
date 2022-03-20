@@ -1,6 +1,6 @@
 {
 	"name": "deep-assoc-completion-vscode",
-	"version": "0.8.0",
+	"version": "0.8.1",
 	"engines": {
 		"vscode": "^1.43.0"
 	},

@@ -1,6 +1,11 @@
 
 # Change Log
 
+## [v0.9.0 - 2022-03-20]
+
+- Fix, argument array keys completion did not work for methods
+- Worked only for functions
+
 ## [v0.8.1 - 2022-03-20]
 
 - Fix, plugin failed to activate starting from vdcode v1.53 due to .js defaulting to es6 imports by default in newer versions of node
